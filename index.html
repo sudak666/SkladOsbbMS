@@ -3,100 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Склад ОСББ</title>
+    <title>Склад ОСББ — Микитська Слобода</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .tab-active { background: #1d4ed8; color: white; }
-        .low-stock { background: #fef2f2; border-left: 3px solid #ef4444; }
-        .zero-stock { opacity: 0.6; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+
+        :root {
+            --sidebar-w: 220px;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+        }
+
+        body { background: #f1f5f9; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-w); background: #1e293b; min-height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; }
+        .sidebar-logo { padding: 20px 16px 12px; border-bottom: 1px solid #334155; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #94a3b8; cursor: pointer; transition: all .15s; border-radius: 0; font-size: 14px; font-weight: 500; }
+        .nav-item:hover { background: #334155; color: #e2e8f0; }
+        .nav-item.active { background: #2563eb; color: #fff; }
+        .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+        /* Main */
+        .main { margin-left: var(--sidebar-w); min-height: 100vh; }
+        .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+
+        /* Pages */
+        .page { display: none; padding: 24px; }
+        .page.active { display: block; }
+
+        /* Cards */
+        .card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        thead th { background: #f8fafc; padding: 10px 14px; text-align: left; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #e2e8f0; }
+        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .1s; }
+        tbody tr:hover { background: #f8fafc; }
+        tbody td { padding: 11px 14px; color: #1e293b; }
+        tbody tr:last-child { border-bottom: none; }
+
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+        .badge-clean  { background: #dcfce7; color: #166534; }
+        .badge-repair { background: #ffedd5; color: #9a3412; }
+        .badge-elec   { background: #fef9c3; color: #713f12; }
+        .badge-plumb  { background: #dbeafe; color: #1e40af; }
+        .badge-other  { background: #f1f5f9; color: #475569; }
+
+        /* Stock indicators */
+        .qty-zero { color: #ef4444; font-weight: 700; }
+        .qty-low  { color: #f97316; font-weight: 700; }
+        .qty-ok   { color: #16a34a; font-weight: 700; }
+        .qty-unknown { color: #94a3b8; font-weight: 500; }
+
+        /* Form inputs */
+        .inp { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 12px; font-size: 14px; outline: none; transition: border .15s; }
+        .inp:focus { border-color: #2563eb; box-shadow: 0 0 0 3px #dbeafe; }
+        label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+
+        /* Buttons */
+        .btn { padding: 9px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; border: none; }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover { background: #15803d; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-ghost { background: #f1f5f9; color: #475569; }
+        .btn-ghost:hover { background: #e2e8f0; }
+
+        /* Cat filter pills */
+        .pill { padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; color: #64748b; background: #fff; transition: all .15s; }
+        .pill.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+        /* Toast */
+        #toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 999; transform: translateY(80px); opacity: 0; transition: all .3s; pointer-events: none; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        #toast.success { background: #16a34a; }
+        #toast.error   { background: #ef4444; }
+
+        /* Log entries */
+        .log-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+        .log-row:last-child { border-bottom: none; }
+        .log-icon { width: 36px; height: 36px; border-radius: 50%; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+        /* Progress bar */
+        .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 6px; }
+        .progress-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* Split layout */
+        .split { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+        .split-wide { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
+
+        /* Search */
+        .search-wrap { position: relative; }
+        .search-wrap input { padding-left: 36px; }
+        .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 15px; }
+
+        /* Empty state */
+        .empty { text-align: center; padding: 48px 24px; color: #94a3b8; }
+        .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+        @media (max-width: 900px) {
+            .split, .split-wide { grid-template-columns: 1fr; }
+            .sidebar { width: 60px; }
+            .sidebar .nav-label, .sidebar-logo h1, .sidebar-logo p { display: none; }
+            .main { margin-left: 60px; }
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body>
 
-<div class="max-w-lg mx-auto">
-    <!-- Шапка -->
-    <div class="bg-blue-700 text-white p-4 sticky top-0 z-10 shadow">
-        <h1 class="text-xl font-bold text-center">🏪 Склад ОСББ</h1>
-        <!-- Вкладки -->
-        <div class="flex mt-3 gap-1">
-            <button onclick="switchTab('items')" id="tab-items" class="tab-active flex-1 py-1.5 rounded-lg text-sm font-medium transition">📦 Товари</button>
-            <button onclick="switchTab('issue')" id="tab-issue" class="flex-1 py-1.5 rounded-lg text-sm font-medium bg-blue-600 transition">➡️ Видача</button>
-            <button onclick="switchTab('log')" id="tab-log" class="flex-1 py-1.5 rounded-lg text-sm font-medium bg-blue-600 transition">📋 Журнал</button>
-            <button onclick="switchTab('add')" id="tab-add" class="flex-1 py-1.5 rounded-lg text-sm font-medium bg-blue-600 transition">➕ Додати</button>
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h1 class="text-white font-bold text-base leading-tight">🏪 Склад</h1>
+        <p class="text-slate-400 text-xs mt-0.5">Микитська Слобода</p>
+    </div>
+    <nav class="mt-3 flex-1">
+        <div class="nav-item active" onclick="nav('items')">
+            <span class="nav-icon">📦</span><span class="nav-label">Товари</span>
+        </div>
+        <div class="nav-item" onclick="nav('issue')">
+            <span class="nav-icon">➡️</span><span class="nav-label">Видача</span>
+        </div>
+        <div class="nav-item" onclick="nav('log')">
+            <span class="nav-icon">📋</span><span class="nav-label">Журнал</span>
+        </div>
+        <div class="nav-item" onclick="nav('add')">
+            <span class="nav-icon">➕</span><span class="nav-label">Додати</span>
+        </div>
+        <div class="nav-item" onclick="nav('stats')">
+            <span class="nav-icon">📊</span><span class="nav-label">Статистика</span>
+        </div>
+    </nav>
+    <div class="p-4 text-xs text-slate-500">v2.0 ПК</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="flex items-center gap-3">
+            <h2 id="pageTitle" class="font-semibold text-slate-700 text-base">📦 Товари на складі</h2>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="lastUpdate" class="text-xs text-slate-400"></span>
+            <button onclick="refreshAll()" class="btn btn-ghost text-sm py-1.5 px-3">🔄 Оновити</button>
         </div>
     </div>
 
-    <!-- ВКЛАДКА: Товари -->
-    <div id="page-items" class="p-3">
-        <!-- Фільтр категорій -->
-        <div class="flex gap-1 flex-wrap mb-3">
-            <button onclick="filterCat('')" class="cat-btn px-2 py-1 text-xs rounded-full bg-blue-600 text-white font-bold" data-cat="">Всі</button>
-            <button onclick="filterCat('Прибирання')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Прибирання">🧹 Прибирання</button>
-            <button onclick="filterCat('Ремонт')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Ремонт">🔧 Ремонт</button>
-            <button onclick="filterCat('Електрика')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Електрика">⚡ Електрика</button>
-            <button onclick="filterCat('Сантехніка')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Сантехніка">🚿 Сантехніка</button>
-        </div>
-        <input id="searchInput" oninput="renderItems()" placeholder="🔍 Пошук товару..." class="w-full border p-2 rounded-lg mb-3 text-sm">
-        <div id="itemsList" class="space-y-2"></div>
-    </div>
-
-    <!-- ВКЛАДКА: Видача -->
-    <div id="page-issue" class="p-3 hidden">
-        <div class="bg-white rounded-xl shadow p-4 space-y-3">
-            <h2 class="font-bold text-gray-700 text-lg">➡️ Видача зі складу</h2>
-            <select id="issueItem" class="w-full border p-2 rounded-lg text-sm">
-                <option value="">— Оберіть товар —</option>
-            </select>
-            <div id="issueStock" class="text-sm text-gray-500 hidden">Залишок: <span id="issueStockVal" class="font-bold text-blue-600"></span></div>
-            <input type="number" id="issueQty" placeholder="Кількість" min="1" class="w-full border p-2 rounded-lg">
-            <input type="text" id="issuePerson" placeholder="Кому видано (ПІБ або посада)" class="w-full border p-2 rounded-lg">
-            <button onclick="issueItem()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Видати</button>
-        </div>
-    </div>
-
-    <!-- ВКЛАДКА: Журнал -->
-    <div id="page-log" class="p-3 hidden">
-        <div class="flex justify-between items-center mb-3">
-            <h2 class="font-bold text-gray-700">📋 Журнал видач</h2>
-            <select id="logFilter" onchange="loadLogs()" class="border text-sm p-1 rounded">
-                <option value="">Всі</option>
-                <option value="Прибирання">🧹 Прибирання</option>
-                <option value="Ремонт">🔧 Ремонт</option>
-                <option value="Електрика">⚡ Електрика</option>
-                <option value="Сантехніка">🚿 Сантехніка</option>
-            </select>
-        </div>
-        <div id="logList" class="space-y-2 text-sm"></div>
-    </div>
-
-    <!-- ВКЛАДКА: Додати товар -->
-    <div id="page-add" class="p-3 hidden">
-        <div class="bg-white rounded-xl shadow p-4 space-y-3">
-            <h2 class="font-bold text-gray-700 text-lg">➕ Додати / Поповнити</h2>
-            <!-- Поповнення існуючого -->
-            <div class="border rounded-lg p-3 space-y-2">
-                <p class="text-sm font-bold text-gray-600">📦 Поповнити існуючий товар</p>
-                <select id="refillItem" class="w-full border p-2 rounded-lg text-sm">
-                    <option value="">— Оберіть товар —</option>
-                </select>
-                <input type="number" id="refillQty" placeholder="Кількість для поповнення" min="1" class="w-full border p-2 rounded-lg">
-                <button onclick="refillItem()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700">Поповнити</button>
+    <!-- PAGE: ITEMS -->
+    <div id="page-items" class="page active">
+        <!-- Stats row -->
+        <div class="grid grid-cols-4 gap-4 mb-5">
+            <div class="stat-card">
+                <div class="text-2xl font-bold text-slate-800" id="stat-total">—</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">Позицій на складі</div>
             </div>
-            <!-- Новий товар -->
-            <div class="border rounded-lg p-3 space-y-2">
-                <p class="text-sm font-bold text-gray-600">🆕 Новий товар</p>
-                <input type="text" id="newName" placeholder="Назва товару" class="w-full border p-2 rounded-lg text-sm">
-                <select id="newCat" class="w-full border p-2 rounded-lg text-sm">
-                    <option value="Прибирання">🧹 Прибирання</option>
-                    <option value="Ремонт">🔧 Ремонт</option>
-                    <option value="Електрика">⚡ Електрика</option>
-                    <option value="Сантехніка">🚿 Сантехніка</option>
-                    <option value="Інше">📦 Інше</option>
-                </select>
-                <input type="text" id="newUnit" placeholder="Одиниця виміру (штук, уп., м.п.)" class="w-full border p-2 rounded-lg text-sm">
-                <input type="number" id="newQty" placeholder="Початкова кількість" min="0" class="w-full border p-2 rounded-lg text-sm">
-                <button onclick="addNewItem()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Додати товар</button>
+            <div class="stat-card">
+                <div class="text-2xl font-bold text-red-500" id="stat-zero">—</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">Закінчились</div>
+            </div>
+            <div class="stat-card">
+                <div class="text-2xl font-bold text-orange-500" id="stat-low">—</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">Мало залишилось</div>
+            </div>
+            <div class="stat-card">
+                <div class="text-2xl font-bold text-green-600" id="stat-ok">—</div>
+                <div class="text-xs text-slate-500 mt-1 font-medium">В достатній кількості</div>
+            </div>
+        </div>
+
+        <!-- Filters + search -->
+        <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+            <div class="flex gap-2 flex-wrap">
+                <button class="pill active" onclick="filterCat(this, '')">Всі</button>
+                <button class="pill" onclick="filterCat(this, 'Прибирання')">🧹 Прибирання</button>
+                <button class="pill" onclick="filterCat(this, 'Ремонт')">🔧 Ремонт</button>
+                <button class="pill" onclick="filterCat(this, 'Електрика')">⚡ Електрика</button>
+                <button class="pill" onclick="filterCat(this, 'Сантехніка')">🚿 Сантехніка</button>
+                <button class="pill" onclick="filterCat(this, 'Інше')">📦 Інше</button>
+            </div>
+            <div class="search-wrap" style="width:260px">
+                <span class="search-icon">🔍</span>
+                <input class="inp" id="searchInput" placeholder="Пошук..." oninput="renderItems()">
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card overflow-hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Назва товару</th>
+                        <th>Категорія</th>
+                        <th>Одиниця</th>
+                        <th>Залишок</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTable">
+                    <tr><td colspan="6" class="text-center py-8 text-slate-400">Завантаження...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGE: ISSUE -->
+    <div id="page-issue" class="page">
+        <div class="split-wide">
+            <!-- Form -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-slate-700 mb-5 text-base">➡️ Оформити видачу зі складу</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label>Товар</label>
+                        <select class="inp" id="issueItemSel" onchange="onIssueSelect()">
+                            <option value="">— Оберіть товар —</option>
+                        </select>
+                    </div>
+                    <div id="issueInfo" class="hidden bg-blue-50 rounded-lg p-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Залишок на складі:</span>
+                            <span id="issueInfoQty" class="font-bold text-blue-700"></span>
+                        </div>
+                        <div class="progress-bar mt-2">
+                            <div class="progress-fill bg-blue-400" id="issueProgress" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label>Кількість</label>
+                            <input type="number" class="inp" id="issueQtyInp" min="0.1" step="0.1" placeholder="0">
+                        </div>
+                        <div>
+                            <label>Дата видачі</label>
+                            <input type="date" class="inp" id="issueDateInp">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Кому видано</label>
+                        <input type="text" class="inp" id="issuePersonInp" placeholder="ПІБ або посада">
+                    </div>
+                    <div>
+                        <label>Примітка (необов'язково)</label>
+                        <input type="text" class="inp" id="issueNoteInp" placeholder="Для якого об'єкту або завдання">
+                    </div>
+                    <button class="btn btn-primary w-full" onclick="doIssue()">✅ Видати зі складу</button>
+                </div>
+            </div>
+            <!-- Recent issues -->
+            <div class="card p-5">
+                <h3 class="font-semibold text-slate-700 mb-4 text-sm">Останні видачі</h3>
+                <div id="recentIssues"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: LOG -->
+    <div id="page-log" class="page">
+        <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+            <div class="flex gap-2 flex-wrap">
+                <button class="pill active" onclick="filterLog(this, '')">Всі</button>
+                <button class="pill" onclick="filterLog(this, 'Прибирання')">🧹 Прибирання</button>
+                <button class="pill" onclick="filterLog(this, 'Ремонт')">🔧 Ремонт</button>
+                <button class="pill" onclick="filterLog(this, 'Електрика')">⚡ Електрика</button>
+                <button class="pill" onclick="filterLog(this, 'Сантехніка')">🚿 Сантехніка</button>
+            </div>
+            <div class="search-wrap" style="width:240px">
+                <span class="search-icon">🔍</span>
+                <input class="inp" id="logSearch" placeholder="Пошук в журналі..." oninput="renderLog()">
+            </div>
+        </div>
+        <div class="card overflow-hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата / Час</th>
+                        <th>Товар</th>
+                        <th>К-сть</th>
+                        <th>Кому видано</th>
+                        <th>Примітка</th>
+                    </tr>
+                </thead>
+                <tbody id="logTable">
+                    <tr><td colspan="5" class="text-center py-8 text-slate-400">Завантаження...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGE: ADD -->
+    <div id="page-add" class="page">
+        <div class="split">
+            <!-- Refill existing -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-slate-700 mb-5 text-base">📦 Поповнити залишок</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label>Оберіть товар</label>
+                        <select class="inp" id="refillSel" onchange="onRefillSelect()">
+                            <option value="">— Оберіть товар —</option>
+                        </select>
+                    </div>
+                    <div id="refillInfo" class="hidden bg-slate-50 rounded-lg p-3 text-sm text-slate-600">
+                        Поточний залишок: <span id="refillCurrent" class="font-bold text-slate-800"></span>
+                    </div>
+                    <div>
+                        <label>Кількість для поповнення</label>
+                        <input type="number" class="inp" id="refillQtyInp" min="0.1" step="0.1" placeholder="0">
+                    </div>
+                    <button class="btn btn-success w-full" onclick="doRefill()">➕ Поповнити</button>
+                </div>
+            </div>
+
+            <!-- New item -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-slate-700 mb-5 text-base">🆕 Новий товар</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label>Назва товару / артикул</label>
+                        <input type="text" class="inp" id="newName" placeholder="Напр.: Лампа LED 10W E27">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label>Категорія</label>
+                            <select class="inp" id="newCat">
+                                <option value="Прибирання">🧹 Прибирання</option>
+                                <option value="Ремонт">🔧 Ремонт</option>
+                                <option value="Електрика">⚡ Електрика</option>
+                                <option value="Сантехніка">🚿 Сантехніка</option>
+                                <option value="Інше">📦 Інше</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Одиниця виміру</label>
+                            <input type="text" class="inp" id="newUnit" placeholder="штук, уп., м.п.">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Початкова кількість</label>
+                        <input type="number" class="inp" id="newQty" min="0" step="0.1" placeholder="0">
+                    </div>
+                    <button class="btn btn-primary w-full" onclick="doAddNew()">✅ Додати товар</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: STATS -->
+    <div id="page-stats" class="page">
+        <div class="grid grid-cols-2 gap-5 mb-5">
+            <div class="card p-5">
+                <h3 class="font-semibold text-slate-700 mb-4 text-sm">📊 Розподіл по категоріях</h3>
+                <div id="statsCats" class="space-y-3"></div>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-semibold text-slate-700 mb-4 text-sm">⚠️ Потребують поповнення</h3>
+                <div id="statsLow" class="space-y-2"></div>
+            </div>
+        </div>
+        <div class="card p-5">
+            <h3 class="font-semibold text-slate-700 mb-4 text-sm">📋 Останні 10 видач</h3>
+            <div id="statsLog" class="space-y-1"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Quick-issue modal (from table row) -->
+<div id="quickModal" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center" onclick="closeQuick(event)">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-96" onclick="event.stopPropagation()">
+        <h3 class="font-semibold text-slate-800 mb-1" id="qmName"></h3>
+        <p class="text-sm text-slate-500 mb-4">Залишок: <span id="qmQty" class="font-bold text-blue-600"></span></p>
+        <div class="space-y-3">
+            <div>
+                <label>Кількість для видачі</label>
+                <input type="number" class="inp" id="qmQtyInp" min="0.1" step="0.1">
+            </div>
+            <div>
+                <label>Кому видано</label>
+                <input type="text" class="inp" id="qmPerson" placeholder="ПІБ або посада">
+            </div>
+            <div class="flex gap-2 mt-2">
+                <button class="btn btn-ghost flex-1" onclick="closeQuick()">Скасувати</button>
+                <button class="btn btn-primary flex-1" onclick="doQuickIssue()">✅ Видати</button>
             </div>
         </div>
     </div>
@@ -109,36 +413,44 @@ const db = createClient(
     'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9'
 );
 
-let allItems = [];
-let currentCat = '';
+let allItems = [], allLogs = [], currentCat = '', logCat = '', quickItemId = null;
 
-// ===== ВКЛАДКИ =====
-function switchTab(tab) {
-    ['items','issue','log','add'].forEach(t => {
-        document.getElementById('page-'+t).classList.add('hidden');
-        document.getElementById('tab-'+t).classList.remove('tab-active');
-        document.getElementById('tab-'+t).classList.add('bg-blue-600');
-    });
-    document.getElementById('page-'+tab).classList.remove('hidden');
-    document.getElementById('tab-'+tab).classList.add('tab-active');
-    document.getElementById('tab-'+tab).classList.remove('bg-blue-600');
-    if (tab === 'log') loadLogs();
-    if (tab === 'issue' || tab === 'add') populateSelects();
+const catBadge = { 'Прибирання':'badge-clean','Ремонт':'badge-repair','Електрика':'badge-elec','Сантехніка':'badge-plumb','Інше':'badge-other' };
+const catIcon  = { 'Прибирання':'🧹','Ремонт':'🔧','Електрика':'⚡','Сантехніка':'🚿','Інше':'📦' };
+
+// ===== NAVIGATION =====
+const pageTitles = { items:'📦 Товари на складі', issue:'➡️ Видача зі складу', log:'📋 Журнал видач', add:'➕ Додати / Поповнити', stats:'📊 Статистика' };
+function nav(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    event.currentTarget.classList.add('active');
+    document.getElementById('pageTitle').textContent = pageTitles[page] || '';
+    if (page === 'issue') { populateSelects(); loadRecentIssues(); }
+    if (page === 'log')   { loadLogs(); }
+    if (page === 'add')   { populateSelects(); }
+    if (page === 'stats') { renderStats(); }
 }
 
-// ===== ТОВАРИ =====
+// ===== LOAD =====
 async function loadItems() {
     const { data } = await db.from('inventory_items').select('*').order('category').order('name');
-    if (data) { allItems = data; renderItems(); }
+    if (data) { allItems = data; renderItems(); updateStats(); }
+    document.getElementById('lastUpdate').textContent = 'Оновлено: ' + new Date().toLocaleTimeString('uk-UA');
 }
 
-function filterCat(cat) {
+async function loadLogs() {
+    const { data } = await db.from('inventory_logs').select('*').order('issued_at', { ascending: false }).limit(100);
+    if (data) { allLogs = data; renderLog(); }
+}
+
+async function refreshAll() { await loadItems(); await loadLogs(); toast('Дані оновлено ✓', 'success'); }
+
+// ===== ITEMS TABLE =====
+function filterCat(btn, cat) {
+    document.querySelectorAll('#page-items .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
     currentCat = cat;
-    document.querySelectorAll('.cat-btn').forEach(b => {
-        b.classList.toggle('bg-blue-600', b.dataset.cat === cat);
-        b.classList.toggle('text-white', b.dataset.cat === cat);
-        b.classList.toggle('bg-gray-200', b.dataset.cat !== cat);
-    });
     renderItems();
 }
 
@@ -148,125 +460,267 @@ function renderItems() {
     if (currentCat) items = items.filter(i => i.category === currentCat);
     if (search) items = items.filter(i => i.name.toLowerCase().includes(search));
 
-    const catColors = { 'Прибирання':'bg-green-100 text-green-700', 'Ремонт':'bg-orange-100 text-orange-700', 'Електрика':'bg-yellow-100 text-yellow-700', 'Сантехніка':'bg-blue-100 text-blue-700', 'Інше':'bg-gray-100 text-gray-700' };
+    const tbody = document.getElementById('itemsTable');
+    if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">📭</div><div>Нічого не знайдено</div></div></td></tr>`;
+        return;
+    }
 
-    document.getElementById('itemsList').innerHTML = items.length ? items.map(i => `
-        <div class="bg-white rounded-lg shadow-sm p-3 ${i.quantity == 0 ? 'zero-stock' : ''} ${i.quantity > 0 && i.quantity <= 2 ? 'low-stock' : ''}">
-            <div class="flex justify-between items-start gap-2">
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-800 leading-tight">${i.name}</p>
-                    <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block ${catColors[i.category] || 'bg-gray-100 text-gray-600'}">${i.category}</span>
-                </div>
-                <div class="text-right shrink-0">
-                    <p class="font-bold text-lg ${i.quantity == 0 ? 'text-red-500' : 'text-blue-700'}">${i.quantity}</p>
-                    <p class="text-xs text-gray-400">${i.unit}</p>
-                </div>
-            </div>
-        </div>
-    `).join('') : '<p class="text-center text-gray-400 py-8">Нічого не знайдено</p>';
+    tbody.innerHTML = items.map((item, idx) => {
+        const qtyClass = item.quantity == 0 ? 'qty-zero' : item.quantity <= 2 ? 'qty-low' : 'qty-ok';
+        const qtyLabel = item.quantity == '?' ? '<span class="qty-unknown">?</span>' : `<span class="${qtyClass}">${item.quantity}</span>`;
+        return `<tr>
+            <td class="text-slate-400 text-xs">${idx+1}</td>
+            <td class="font-medium text-slate-800 max-w-xs">${item.name}</td>
+            <td><span class="badge ${catBadge[item.category]||'badge-other'}">${catIcon[item.category]||'📦'} ${item.category}</span></td>
+            <td class="text-slate-500 text-xs">${item.unit}</td>
+            <td>${qtyLabel} <span class="text-slate-400 text-xs">${item.unit}</span></td>
+            <td><button class="btn btn-ghost text-xs py-1 px-3" onclick="openQuick(${item.id})">➡️ Видати</button></td>
+        </tr>`;
+    }).join('');
 }
 
-// ===== ЗАПОВНЕННЯ СЕЛЕКТІВ =====
-function populateSelects() {
-    const opts = allItems.map(i => `<option value="${i.id}" data-qty="${i.quantity}" data-unit="${i.unit}">${i.name} (${i.quantity} ${i.unit})</option>`).join('');
-    document.getElementById('issueItem').innerHTML = '<option value="">— Оберіть товар —</option>' + opts;
-    document.getElementById('refillItem').innerHTML = '<option value="">— Оберіть товар —</option>' + opts;
-    document.getElementById('issueItem').onchange = function() {
-        const opt = this.options[this.selectedIndex];
-        if (this.value) {
-            document.getElementById('issueStock').classList.remove('hidden');
-            document.getElementById('issueStockVal').textContent = opt.dataset.qty + ' ' + opt.dataset.unit;
-        } else {
-            document.getElementById('issueStock').classList.add('hidden');
-        }
-    };
+function updateStats() {
+    document.getElementById('stat-total').textContent = allItems.length;
+    document.getElementById('stat-zero').textContent = allItems.filter(i => i.quantity == 0).length;
+    document.getElementById('stat-low').textContent  = allItems.filter(i => i.quantity > 0 && i.quantity <= 3).length;
+    document.getElementById('stat-ok').textContent   = allItems.filter(i => i.quantity > 3).length;
 }
 
-// ===== ВИДАЧА =====
-async function issueItem() {
-    const sel = document.getElementById('issueItem');
-    const itemId = parseInt(sel.value);
-    const qty = parseFloat(document.getElementById('issueQty').value);
-    const person = document.getElementById('issuePerson').value.trim();
-    if (!itemId) return alert('Оберіть товар!');
-    if (!qty || qty <= 0) return alert('Вкажіть кількість!');
-    if (!person) return alert('Вкажіть кому видано!');
+// ===== QUICK ISSUE MODAL =====
+function openQuick(id) {
+    const item = allItems.find(i => i.id === id);
+    quickItemId = id;
+    document.getElementById('qmName').textContent = item.name;
+    document.getElementById('qmQty').textContent = item.quantity + ' ' + item.unit;
+    document.getElementById('qmQtyInp').value = '';
+    document.getElementById('qmPerson').value = '';
+    document.getElementById('quickModal').classList.remove('hidden');
+    document.getElementById('quickModal').classList.add('flex');
+    document.getElementById('qmQtyInp').focus();
+}
+function closeQuick(e) {
+    if (e && e.target !== document.getElementById('quickModal')) return;
+    document.getElementById('quickModal').classList.add('hidden');
+    document.getElementById('quickModal').classList.remove('flex');
+    quickItemId = null;
+}
+async function doQuickIssue() {
+    const qty = parseFloat(document.getElementById('qmQtyInp').value);
+    const person = document.getElementById('qmPerson').value.trim();
+    if (!qty || qty <= 0) return toast('Вкажіть кількість!', 'error');
+    if (!person) return toast('Вкажіть кому видано!', 'error');
+    await issueFromId(quickItemId, qty, person, '');
+    closeQuick({ target: document.getElementById('quickModal') });
+}
 
+// ===== ISSUE PAGE =====
+function onIssueSelect() {
+    const sel = document.getElementById('issueItemSel');
+    const item = allItems.find(i => i.id == sel.value);
+    if (!item) { document.getElementById('issueInfo').classList.add('hidden'); return; }
+    document.getElementById('issueInfo').classList.remove('hidden');
+    document.getElementById('issueInfoQty').textContent = item.quantity + ' ' + item.unit;
+}
+
+async function doIssue() {
+    const itemId = parseInt(document.getElementById('issueItemSel').value);
+    const qty = parseFloat(document.getElementById('issueQtyInp').value);
+    const person = document.getElementById('issuePersonInp').value.trim();
+    const note = document.getElementById('issueNoteInp').value.trim();
+    if (!itemId) return toast('Оберіть товар!', 'error');
+    if (!qty || qty <= 0) return toast('Вкажіть кількість!', 'error');
+    if (!person) return toast('Вкажіть кому видано!', 'error');
+    await issueFromId(itemId, qty, person, note);
+    document.getElementById('issueQtyInp').value = '';
+    document.getElementById('issuePersonInp').value = '';
+    document.getElementById('issueNoteInp').value = '';
+    document.getElementById('issueItemSel').value = '';
+    document.getElementById('issueInfo').classList.add('hidden');
+    loadRecentIssues();
+}
+
+async function issueFromId(itemId, qty, person, note) {
     const item = allItems.find(i => i.id === itemId);
-    if (item.quantity < qty) return alert(`Недостатньо на складі! Залишок: ${item.quantity} ${item.unit}`);
-
-    const newQty = item.quantity - qty;
+    if (!item) return toast('Товар не знайдено!', 'error');
+    if (item.quantity < qty) return toast(`Недостатньо! Залишок: ${item.quantity} ${item.unit}`, 'error');
+    const newQty = Math.round((item.quantity - qty) * 100) / 100;
     const { error: e1 } = await db.from('inventory_items').update({ quantity: newQty }).eq('id', itemId);
-    const { error: e2 } = await db.from('inventory_logs').insert([{ item_id: itemId, item_name: item.name, quantity: qty, issued_to: person }]);
-
-    if (e1 || e2) return alert('Помилка: ' + (e1?.message || e2?.message));
-
-    alert(`✅ Видано: ${qty} ${item.unit} → ${person}`);
-    document.getElementById('issueQty').value = '';
-    document.getElementById('issuePerson').value = '';
-    document.getElementById('issueItem').value = '';
-    document.getElementById('issueStock').classList.add('hidden');
-    await loadItems();
-    populateSelects();
-}
-
-// ===== ПОПОВНЕННЯ =====
-async function refillItem() {
-    const itemId = parseInt(document.getElementById('refillItem').value);
-    const qty = parseFloat(document.getElementById('refillQty').value);
-    if (!itemId) return alert('Оберіть товар!');
-    if (!qty || qty <= 0) return alert('Вкажіть кількість!');
-
-    const item = allItems.find(i => i.id === itemId);
-    const newQty = item.quantity + qty;
-    const { error } = await db.from('inventory_items').update({ quantity: newQty }).eq('id', itemId);
-    if (error) return alert('Помилка: ' + error.message);
-
-    alert(`✅ Поповнено: +${qty} ${item.unit}`);
-    document.getElementById('refillQty').value = '';
-    await loadItems();
-    populateSelects();
-}
-
-// ===== НОВИЙ ТОВАР =====
-async function addNewItem() {
-    const name = document.getElementById('newName').value.trim();
-    const category = document.getElementById('newCat').value;
-    const unit = document.getElementById('newUnit').value.trim() || 'штук';
-    const quantity = parseFloat(document.getElementById('newQty').value) || 0;
-    if (!name) return alert('Введіть назву товару!');
-
-    const { error } = await db.from('inventory_items').insert([{ name, category, unit, quantity }]);
-    if (error) return alert('Помилка: ' + error.message);
-
-    alert(`✅ Товар "${name}" додано!`);
-    document.getElementById('newName').value = '';
-    document.getElementById('newUnit').value = '';
-    document.getElementById('newQty').value = '';
+    const { error: e2 } = await db.from('inventory_logs').insert([{ item_id: itemId, item_name: item.name, quantity: qty, issued_to: person, note: note || null }]);
+    if (e1 || e2) return toast('Помилка: ' + (e1?.message || e2?.message), 'error');
+    toast(`✅ Видано: ${qty} ${item.unit} → ${person}`, 'success');
     await loadItems();
 }
 
-// ===== ЖУРНАЛ =====
-async function loadLogs() {
-    const { data } = await db.from('inventory_logs').select('*').order('issued_at', { ascending: false }).limit(50);
-    const list = document.getElementById('logList');
-    if (!data || !data.length) { list.innerHTML = '<p class="text-center text-gray-400 py-8">Записів немає</p>'; return; }
-
-    list.innerHTML = data.map(l => {
-        const date = new Date(l.issued_at).toLocaleString('uk-UA', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-        return `
-        <div class="bg-white rounded-lg p-3 shadow-sm">
-            <p class="font-medium text-sm text-gray-800">${l.item_name}</p>
-            <div class="flex justify-between mt-1 text-xs text-gray-500">
-                <span>📤 <b>${l.quantity}</b> → ${l.issued_to || '---'}</span>
-                <span>${date}</span>
+async function loadRecentIssues() {
+    const { data } = await db.from('inventory_logs').select('*').order('issued_at', { ascending: false }).limit(8);
+    const el = document.getElementById('recentIssues');
+    if (!data || !data.length) { el.innerHTML = '<div class="empty" style="padding:24px"><div class="empty-icon" style="font-size:24px">📭</div><div class="text-sm">Видач ще не було</div></div>'; return; }
+    el.innerHTML = data.map(l => {
+        const d = new Date(l.issued_at);
+        const dt = d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}) + ' ' + d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+        return `<div class="log-row">
+            <div class="log-icon">📤</div>
+            <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-slate-700 truncate">${l.item_name}</div>
+                <div class="text-xs text-slate-400">${l.issued_to} · ${dt}</div>
             </div>
+            <div class="text-sm font-bold text-blue-600 shrink-0">−${l.quantity}</div>
         </div>`;
     }).join('');
 }
 
-// ===== СТАРТ =====
-loadItems();
+// ===== LOG PAGE =====
+function filterLog(btn, cat) {
+    document.querySelectorAll('#page-log .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    logCat = cat;
+    renderLog();
+}
+
+function renderLog() {
+    const search = document.getElementById('logSearch').value.toLowerCase();
+    let logs = allLogs;
+    if (logCat) logs = logs.filter(l => {
+        const item = allItems.find(i => i.id === l.item_id);
+        return item && item.category === logCat;
+    });
+    if (search) logs = logs.filter(l => l.item_name.toLowerCase().includes(search) || (l.issued_to||'').toLowerCase().includes(search));
+
+    const tbody = document.getElementById('logTable');
+    if (!logs.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">📭</div>Записів не знайдено</div></td></tr>`; return; }
+
+    tbody.innerHTML = logs.map(l => {
+        const d = new Date(l.issued_at);
+        const dt = d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+        const item = allItems.find(i => i.id === l.item_id);
+        const cat = item ? item.category : '';
+        return `<tr>
+            <td class="text-xs text-slate-500 whitespace-nowrap">${dt}</td>
+            <td class="font-medium text-slate-700">
+                ${l.item_name}
+                ${cat ? `<span class="badge ${catBadge[cat]||'badge-other'} ml-1">${cat}</span>` : ''}
+            </td>
+            <td class="font-bold text-slate-700">${l.quantity} <span class="font-normal text-slate-400 text-xs">${item ? item.unit : ''}</span></td>
+            <td class="text-slate-600">${l.issued_to || '—'}</td>
+            <td class="text-slate-400 text-xs">${l.note || '—'}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ===== ADD PAGE =====
+function onRefillSelect() {
+    const id = parseInt(document.getElementById('refillSel').value);
+    const item = allItems.find(i => i.id === id);
+    if (!item) { document.getElementById('refillInfo').classList.add('hidden'); return; }
+    document.getElementById('refillInfo').classList.remove('hidden');
+    document.getElementById('refillCurrent').textContent = item.quantity + ' ' + item.unit;
+}
+
+async function doRefill() {
+    const itemId = parseInt(document.getElementById('refillSel').value);
+    const qty = parseFloat(document.getElementById('refillQtyInp').value);
+    if (!itemId) return toast('Оберіть товар!', 'error');
+    if (!qty || qty <= 0) return toast('Вкажіть кількість!', 'error');
+    const item = allItems.find(i => i.id === itemId);
+    const newQty = Math.round((item.quantity + qty) * 100) / 100;
+    const { error } = await db.from('inventory_items').update({ quantity: newQty }).eq('id', itemId);
+    if (error) return toast('Помилка: ' + error.message, 'error');
+    toast(`✅ Поповнено: +${qty} ${item.unit}`, 'success');
+    document.getElementById('refillQtyInp').value = '';
+    document.getElementById('refillInfo').classList.add('hidden');
+    document.getElementById('refillSel').value = '';
+    await loadItems();
+    populateSelects();
+}
+
+async function doAddNew() {
+    const name = document.getElementById('newName').value.trim();
+    const category = document.getElementById('newCat').value;
+    const unit = document.getElementById('newUnit').value.trim() || 'штук';
+    const quantity = parseFloat(document.getElementById('newQty').value) || 0;
+    if (!name) return toast('Введіть назву товару!', 'error');
+    const { error } = await db.from('inventory_items').insert([{ name, category, unit, quantity }]);
+    if (error) return toast('Помилка: ' + error.message, 'error');
+    toast(`✅ Товар "${name}" додано!`, 'success');
+    document.getElementById('newName').value = '';
+    document.getElementById('newUnit').value = '';
+    document.getElementById('newQty').value = '';
+    await loadItems();
+    populateSelects();
+}
+
+// ===== STATS =====
+function renderStats() {
+    // By category
+    const cats = [...new Set(allItems.map(i => i.category))];
+    document.getElementById('statsCats').innerHTML = cats.map(cat => {
+        const items = allItems.filter(i => i.category === cat);
+        const pct = Math.round(items.length / allItems.length * 100);
+        return `<div>
+            <div class="flex justify-between text-sm mb-1">
+                <span class="font-medium text-slate-700">${catIcon[cat]||'📦'} ${cat}</span>
+                <span class="text-slate-500">${items.length} поз.</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill bg-blue-400" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('');
+
+    // Low stock
+    const low = allItems.filter(i => i.quantity <= 2).sort((a,b) => a.quantity - b.quantity);
+    document.getElementById('statsLow').innerHTML = low.length
+        ? low.map(i => `<div class="flex justify-between items-center py-1.5 border-b border-slate-100 last:border-0 text-sm">
+            <span class="text-slate-700 truncate flex-1 mr-2">${i.name}</span>
+            <span class="${i.quantity==0?'qty-zero':'qty-low'} shrink-0">${i.quantity} ${i.unit}</span>
+          </div>`).join('')
+        : '<div class="text-green-600 text-sm font-medium">✅ Всі товари в достатній кількості</div>';
+
+    // Recent log
+    const recent = [...allLogs].slice(0, 10);
+    document.getElementById('statsLog').innerHTML = recent.map(l => {
+        const d = new Date(l.issued_at).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
+        return `<div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-sm">
+            <span class="text-slate-700 truncate flex-1 mr-2">${l.item_name}</span>
+            <span class="text-slate-500 mr-3 shrink-0">${l.issued_to}</span>
+            <span class="text-xs text-slate-400 shrink-0">${d}</span>
+        </div>`;
+    }).join('') || '<div class="empty" style="padding:16px">Журнал порожній</div>';
+}
+
+// ===== SELECTS =====
+function populateSelects() {
+    const opts = allItems.map(i => `<option value="${i.id}">${i.name} (${i.quantity} ${i.unit})</option>`).join('');
+    ['issueItemSel','refillSel'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '<option value="">— Оберіть товар —</option>' + opts;
+    });
+}
+
+// ===== TOAST =====
+let toastTimer;
+function toast(msg, type = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.className = '', 3000);
+}
+
+// ===== INIT =====
+document.getElementById('issueDateInp').value = new Date().toISOString().slice(0,10);
+loadItems().then(() => loadLogs());
+
+// Keyboard shortcut: Escape closes modal
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { document.getElementById('quickModal').classList.add('hidden'); document.getElementById('quickModal').classList.remove('flex'); }
+});
+
+// Додаємо note колонку якщо потрібно (тихо)
+db.from('inventory_logs').select('note').limit(1).then(({error}) => {
+    if (error && error.message.includes('note')) {
+        // колонка відсутня — нічого страшного, просто не відображатиметься
+    }
+});
 </script>
 </body>
 </html>
