@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал Складу</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">📝 Журнал Складу</h1>
+        
+        <div class="space-y-3 mb-8">
+            <input type="text" id="itemName" placeholder="Найменування товару" class="w-full border p-2 rounded-lg">
+            <input type="number" id="qty" placeholder="Кількість" class="w-full border p-2 rounded-lg">
+            <input type="text" id="issuedTo" placeholder="Кому видано" class="w-full border p-2 rounded-lg">
+            <button onclick="addLog()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Зберегти запис</button>
+        </div>
+
+        <h2 class="text-lg font-bold mb-3">Останні записи:</h2>
+        <div id="logList" class="space-y-2 text-sm text-gray-600"></div>
+    </div>
+
+    <script>
+        // --- ВСТАВТЕ ВАШІ ДАНІ НИЖЧЕ ---
+        const SUPABASE_URL = 'https://vkwkyhjjjmcpmiakxohw.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9';
+        // -------------------------------
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function addLog() {
+            const item = document.getElementById('itemName').value;
+            const q = parseInt(document.getElementById('qty').value);
+            const person = document.getElementById('issuedTo').value;
+
+            if(!item || !q) return alert("Заповніть назву та кількість!");
+
+            const { error } = await supabase
+                .from('inventory_logs')
+                .insert([{ item_name: item, quantity: q, issued_to: person }]);
+
+            if (error) {
+                alert("Помилка: " + error.message);
+            } else {
+                alert("Успішно додано!");
+                location.reload();
+            }
+        }
+
+        async function loadLogs() {
+            const { data, error } = await supabase.from('inventory_logs').select('*').order('date', {ascending: false});
+            const list = document.getElementById('logList');
+            if(data) {
+                list.innerHTML = data.map(l => `
+                    <div class="border-b pb-1">
+                        <span class="font-bold">${l.item_name}</span>: ${l.quantity} шт. (${l.issued_to || '---'})
+                    </div>
+                `).join('');
+            }
+        }
+
+        loadLogs();
+    </script>
+</body>
+</html>
