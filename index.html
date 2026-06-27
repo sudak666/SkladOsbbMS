@@ -37,7 +37,10 @@ nav{margin-top:8px;flex:1;}
 .page.active{display:block;}
 .card{background:#fff;border-radius:16px;border:1px solid rgba(99,102,241,.1);box-shadow:0 1px 8px rgba(99,102,241,.06);}
 
-.stat-card{border-radius:16px;padding:20px 22px;color:#fff;position:relative;overflow:hidden;}
+.stat-card{border-radius:16px;padding:20px 22px;color:#fff;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.stat-card:active{transform:scale(.97);}
+.stat-card.sc-active{outline:3px solid rgba(255,255,255,.6);}
 .stat-card::after{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.1);}
 .stat-card .big{font-size:32px;font-weight:800;line-height:1;}
 .stat-card .lbl{font-size:12px;opacity:.85;margin-top:5px;font-weight:500;}
@@ -124,6 +127,43 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   .sidebar{width:60px;}
   .ni .nav-label,.sb-logo h1,.sb-logo p,.sb-ver,.sb-bottom{display:none;}
   .main{margin-left:60px;}
+}
+
+/* ===TABLET=== */
+@media(max-width:960px){
+  .split{grid-template-columns:1fr!important;}
+  .g4{grid-template-columns:1fr 1fr;}
+  .sidebar{width:64px;}
+  .ni .nav-label,.sb-logo h1,.sb-logo p,.sb-ver,.sb-bottom{display:none!important;}
+  .ni{justify-content:center;padding:12px 0;margin:2px 4px;}
+  .main{margin-left:64px;}
+}
+
+/* ===MOBILE === */
+@media(max-width:600px){
+  .sidebar{display:none!important;}
+  .main{margin-left:0!important;padding-bottom:80px;}
+  .topbar{padding:0 10px;height:50px;}
+  .topbar h2{font-size:13px;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .topbar-right-excel{display:none!important;}
+  .page{padding:10px 8px;}
+  .g4{grid-template-columns:1fr 1fr;gap:8px;}
+  .stat-card{padding:12px 10px;}
+  .stat-card .big{font-size:22px;}
+  .stat-card .lbl{font-size:10px;margin-top:3px;}
+  .split{grid-template-columns:1fr!important;}
+  .desktop-table{display:none!important;}
+  .mobile-cards{display:block!important;}
+  #catPills{flex-wrap:nowrap!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:6px!important;padding-bottom:2px;}
+  #catPills::-webkit-scrollbar{display:none;}
+  #catPills .pill{flex-shrink:0;white-space:nowrap;padding:5px 11px;font-size:12px;}
+  .sw{width:100%!important;}
+  .card{border-radius:10px;}
+  .modal{padding:16px!important;width:94vw!important;max-width:94vw!important;border-radius:14px!important;}
+  .inp{font-size:16px!important;padding:11px 12px;}
+  .btn{font-size:13px;}
+  .alert-banner{font-size:12px;padding:9px 12px;}
+  .bottom-nav{display:flex!important;}
 }
 
 /* ===BOTTOM NAV (mobile only)=== */
@@ -247,12 +287,12 @@ canvas#stockChart{width:100%!important;max-height:300px;}
       <div class="alert-banner">🔔 <span id="alertText"></span> — натисніть щоб переглянути</div>
     </div>
     <div class="g4" style="margin-bottom:22px;">
-      <div class="stat-card sc-purple"><div class="big" id="st-total">—</div><div class="lbl">📦 Позицій</div></div>
-      <div class="stat-card sc-red"><div class="big" id="st-zero">—</div><div class="lbl">❌ Закінчились</div></div>
-      <div class="stat-card sc-orange"><div class="big" id="st-low">—</div><div class="lbl">⚠️ Мало залишилось</div></div>
-      <div class="stat-card sc-green"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div></div>
+      <div class="stat-card sc-purple" onclick="filterByStock('all',this)"><div class="big" id="st-total">—</div><div class="lbl">📦 Всі позиції</div></div>
+      <div class="stat-card sc-red" onclick="filterByStock('zero',this)"><div class="big" id="st-zero">—</div><div class="lbl">❌ Закінчились</div></div>
+      <div class="stat-card sc-orange" onclick="filterByStock('low',this)"><div class="big" id="st-low">—</div><div class="lbl">⚠️ Мало залишилось</div></div>
+      <div class="stat-card sc-green" onclick="filterByStock('ok',this)"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div></div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills" class="pills-wrap">
         <button class="pill active" onclick="filterCat(this,'')">Всі</button>
         <button class="pill" onclick="filterCat(this,'Прибирання')">🧹 Прибирання</button>
@@ -302,7 +342,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
 
   <!-- LOG -->
   <div id="page-log" class="page">
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;" class="pills-wrap">
         <button class="pill active" onclick="filterLogCat(this,'')">Всі</button>
         <button class="pill" onclick="filterLogCat(this,'Прибирання')">🧹</button>
@@ -312,7 +352,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
       </div>
       <div class="sw" style="width:240px;"><span class="si">🔍</span><input class="inp" id="logSearch" placeholder="Пошук..." oninput="renderLog()"></div>
     </div>
-    <div class="card desktop-table" style="overflow:hidden;">
+    <div class="card" style="overflow:hidden;">
       <table>
         <thead><tr><th>Дата</th><th>Товар</th><th>К-сть</th><th>Кому</th><th>Примітка</th></tr></thead>
         <tbody id="logTable"><tr><td colspan="5" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
@@ -515,6 +555,19 @@ function checkAlerts(){
   }
 }
 
+let stockFilter=''; // 'all','zero','low','ok',''
+
+function filterByStock(mode, card){
+  // toggle: click same card again = reset
+  if(stockFilter===mode){ stockFilter=''; }
+  else { stockFilter=mode; }
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('sc-active'));
+  if(stockFilter) card.classList.add('sc-active');
+  renderItems();
+  // scroll to table
+  document.getElementById('itemsTable').closest('.card')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function filterCat(btn,cat){
   document.querySelectorAll('#catPills .pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');curCat=cat;renderItems();
@@ -523,6 +576,9 @@ function renderItems(){
   const s=document.getElementById('searchInp').value.toLowerCase();
   let items=allItems;
   if(curCat) items=items.filter(i=>i.category===curCat);
+  if(stockFilter==='zero') items=items.filter(i=>i.quantity==0);
+  else if(stockFilter==='low') items=items.filter(i=>i.quantity>0&&i.quantity<=3);
+  else if(stockFilter==='ok') items=items.filter(i=>i.quantity>3);
   if(s) items=items.filter(i=>i.name.toLowerCase().includes(s));
   const tb=document.getElementById('itemsTable');
   if(!items.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div style="font-size:40px;margin-bottom:10px;">📭</div>Нічого не знайдено</div></td></tr>';return;}
