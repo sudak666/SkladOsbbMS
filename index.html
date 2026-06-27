@@ -16,47 +16,42 @@
             <input type="text" id="itemName" placeholder="Найменування товару" class="w-full border p-2 rounded-lg">
             <input type="number" id="qty" placeholder="Кількість" class="w-full border p-2 rounded-lg">
             <input type="text" id="issuedTo" placeholder="Кому видано" class="w-full border p-2 rounded-lg">
-            <button onclick="addLog()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Зберегти запис</button>
+            <button id="saveBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Зберегти запис</button>
         </div>
 
         <h2 class="text-lg font-bold mb-3">Останні записи:</h2>
-        <div id="logList" class="space-y-2 text-sm text-gray-600">
-            <p>Завантаження даних...</p>
-        </div>
+        <div id="logList" class="space-y-2 text-sm text-gray-600"></div>
     </div>
 
     <script>
-        // --- ВАШІ КЛЮЧІ ВЖЕ ВСТАВЛЕНІ ---
-        const SUPABASE_URL = 'https://vkwkyhjjjmcpmiakxohw.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9';
-        // --------------------------------
+        // Ініціалізація один раз
+        const supabase = supabase.createClient(
+            'https://vkwkyhjjjmcpmiakxohw.supabase.co', 
+            'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9'
+        );
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        async function addLog() {
+        // Використовуємо addEventListener замість onclick в HTML (це надійніше)
+        document.getElementById('saveBtn').addEventListener('click', async () => {
             const item = document.getElementById('itemName').value;
             const q = parseInt(document.getElementById('qty').value);
             const person = document.getElementById('issuedTo').value;
 
-            if(!item || !q) {
-                alert("Заповніть назву товару та кількість!");
-                return;
-            }
+            if(!item || !q) return alert("Заповніть назву та кількість!");
 
             const { error } = await supabase
                 .from('inventory_logs')
                 .insert([{ item_name: item, quantity: q, issued_to: person }]);
 
             if (error) {
-                alert("Помилка при збереженні: " + error.message);
+                alert("Помилка: " + error.message);
             } else {
-                alert("Успішно додано!");
+                alert("Успішно!");
                 document.getElementById('itemName').value = '';
                 document.getElementById('qty').value = '';
                 document.getElementById('issuedTo').value = '';
-                loadLogs();
+                loadLogs(); // Оновлюємо список
             }
-        }
+        });
 
         async function loadLogs() {
             const { data, error } = await supabase
@@ -65,20 +60,16 @@
                 .order('created_at', { ascending: false });
 
             const list = document.getElementById('logList');
-            if (error) {
-                list.innerHTML = `<p class="text-red-500">Помилка завантаження: ${error.message}</p>`;
-                return;
-            }
-            if (data) {
+            if(data) {
                 list.innerHTML = data.map(l => `
-                    <div class="border-b pb-2 flex justify-between">
-                        <span><b class="text-black">${l.item_name}</b>: ${l.quantity} шт.</span>
-                        <span class="text-gray-400 italic">${l.issued_to || '---'}</span>
+                    <div class="border-b pb-1">
+                        <span class="font-bold">${l.item_name}</span>: ${l.quantity} шт. (${l.issued_to || '---'})
                     </div>
                 `).join('');
             }
         }
 
+        // Запуск
         loadLogs();
     </script>
 </body>
