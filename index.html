@@ -123,6 +123,23 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   .ni .nav-label,.sb-logo h1,.sb-logo p,.sb-ver,.sb-bottom{display:none;}
   .main{margin-left:60px;}
 }
+
+/* ===BOTTOM NAV (mobile only)=== */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,#1e1b4b,#312e81);z-index:30;height:64px;align-items:stretch;border-top:1px solid rgba(255,255,255,.1);box-shadow:0 -4px 20px rgba(99,102,241,.3);}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#a5b4fc;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;padding:4px 0;position:relative;}
+.bn-item.active{color:#fff;}
+.bn-item.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;}
+.bn-icon{font-size:20px;line-height:1;}
+.bn-badge{position:absolute;top:6px;right:calc(50% - 16px);background:#ef4444;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;}
+
+/* Mobile item card */
+.m-card{background:#fff;border-radius:12px;border:1px solid rgba(99,102,241,.1);padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(99,102,241,.06);}
+.m-card-title{font-size:13.5px;font-weight:600;color:#1e1b4b;line-height:1.4;margin-bottom:8px;}
+.m-card-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.m-card-qty{font-size:22px;font-weight:800;line-height:1;}
+.m-card-actions{display:flex;gap:6px;margin-top:10px;}
+.m-card-actions .btn{flex:1;justify-content:center;padding:9px 10px;font-size:13px;}
+
 </style>
 </head>
 <body>
@@ -168,7 +185,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
       <div class="stat-card sc-green"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills" class="pills-wrap">
         <button class="pill active" onclick="filterCat(this,'')">Всі</button>
         <button class="pill" onclick="filterCat(this,'Прибирання')">🧹 Прибирання</button>
         <button class="pill" onclick="filterCat(this,'Ремонт')">🔧 Ремонт</button>
@@ -179,12 +196,14 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
       </div>
       <div class="sw" style="width:250px;"><span class="si">🔍</span><input class="inp" id="searchInp" placeholder="Пошук..." oninput="renderItems()"></div>
     </div>
-    <div class="card" style="overflow:hidden;">
+    <div class="card desktop-table" style="overflow:hidden;">
       <table>
         <thead><tr><th>#</th><th>Назва товару</th><th>Категорія</th><th>Одиниця</th><th>Фото</th><th>Залишок</th><th>Дії</th></tr></thead>
         <tbody id="itemsTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
       </table>
     </div>
+    <!-- MOBILE CARDS -->
+    <div class="mobile-cards" style="display:none;" id="mobileCards"></div>
   </div>
 
   <!-- ISSUE -->
@@ -216,7 +235,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   <!-- LOG -->
   <div id="page-log" class="page">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" class="pills-wrap">
         <button class="pill active" onclick="filterLogCat(this,'')">Всі</button>
         <button class="pill" onclick="filterLogCat(this,'Прибирання')">🧹</button>
         <button class="pill" onclick="filterLogCat(this,'Ремонт')">🔧</button>
@@ -225,7 +244,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
       </div>
       <div class="sw" style="width:240px;"><span class="si">🔍</span><input class="inp" id="logSearch" placeholder="Пошук..." oninput="renderLog()"></div>
     </div>
-    <div class="card" style="overflow:hidden;">
+    <div class="card desktop-table" style="overflow:hidden;">
       <table>
         <thead><tr><th>Дата</th><th>Товар</th><th>К-сть</th><th>Кому</th><th>Примітка</th></tr></thead>
         <tbody id="logTable"><tr><td colspan="5" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
@@ -349,11 +368,14 @@ const catIcon={'Прибирання':'🧹','Ремонт':'🔧','Електр
 const catColor={'Прибирання':'#16a34a','Ремонт':'#ea580c','Електрика':'#ca8a04','Сантехніка':'#2563eb','Відеоспостереження':'#7c3aed','Інше':'#64748b'};
 const pageTitles={items:'📦 Товари на складі',issue:'➡️ Видача зі складу',log:'📋 Журнал видач',add:'➕ Додати / Поповнити',stats:'📊 Статистика'};
 
-function nav(page,el){
+function nav(page,el,fromBottom){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   if(el) el.classList.add('active');
+  // sync sidebar and bottom nav
+  document.querySelectorAll('.ni[data-page='+page+'],.bn-item[data-page='+page+']').forEach(n=>n.classList.add('active'));
   document.getElementById('pageTitle').textContent=pageTitles[page]||'';
   if(page==='issue'){populateSels();loadRecentIssues();}
   if(page==='log'){loadLogs();}
@@ -380,13 +402,17 @@ function checkAlerts(){
   const banner=document.getElementById('alertBanner');
   if(total>0){
     sb.style.display='inline-block';sb.textContent=total;
+    const bnA=document.getElementById('bn-alert');if(bnA){bnA.style.display='inline-block';bnA.textContent=total;}
     banner.style.display='block';
     let txt='';
     if(zero>0) txt+=zero+' товар(ів) закінчились';
     if(zero>0&&low>0) txt+=', ';
     if(low>0) txt+=low+' товар(ів) на межі';
     document.getElementById('alertText').textContent='🔔 '+txt;
-  } else {sb.style.display='none';banner.style.display='none';}
+  } else {
+    sb.style.display='none';banner.style.display='none';
+    const bnA=document.getElementById('bn-alert');if(bnA) bnA.style.display='none';
+  }
 }
 
 function filterCat(btn,cat){
@@ -685,5 +711,26 @@ document.addEventListener('keydown',e=>{
 
 loadItems().then(()=>loadLogs());
 </script>
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bottom-nav" id="bottomNav">
+  <div class="bn-item active" data-page="items" onclick="nav('items',this,true)">
+    <span class="bn-icon">📦</span><span>Товари</span>
+    <span class="bn-badge" id="bn-alert" style="display:none">!</span>
+  </div>
+  <div class="bn-item" data-page="issue" onclick="nav('issue',this,true)">
+    <span class="bn-icon">➡️</span><span>Видача</span>
+  </div>
+  <div class="bn-item" data-page="log" onclick="nav('log',this,true)">
+    <span class="bn-icon">📋</span><span>Журнал</span>
+  </div>
+  <div class="bn-item" data-page="add" onclick="nav('add',this,true)">
+    <span class="bn-icon">➕</span><span>Додати</span>
+  </div>
+  <div class="bn-item" data-page="stats" onclick="nav('stats',this,true)">
+    <span class="bn-icon">📊</span><span>Статистика</span>
+  </div>
+</div>
+
 </body>
 </html>
