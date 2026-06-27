@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 p-4">
+<body class="bg-gray-100 min-h-screen p-4">
 
     <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg">
         <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">📝 Журнал Складу</h1>
@@ -20,14 +20,16 @@
         </div>
 
         <h2 class="text-lg font-bold mb-3">Останні записи:</h2>
-        <div id="logList" class="space-y-2 text-sm text-gray-600"></div>
+        <div id="logList" class="space-y-2 text-sm text-gray-600">
+            <p>Завантаження даних...</p>
+        </div>
     </div>
 
     <script>
-        // --- ВСТАВТЕ ВАШІ ДАНІ НИЖЧЕ ---
+        // --- ВАШІ КЛЮЧІ ВЖЕ ВСТАВЛЕНІ ---
         const SUPABASE_URL = 'https://vkwkyhjjjmcpmiakxohw.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9';
-        // -------------------------------
+        // --------------------------------
 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -36,27 +38,42 @@
             const q = parseInt(document.getElementById('qty').value);
             const person = document.getElementById('issuedTo').value;
 
-            if(!item || !q) return alert("Заповніть назву та кількість!");
+            if(!item || !q) {
+                alert("Заповніть назву товару та кількість!");
+                return;
+            }
 
             const { error } = await supabase
                 .from('inventory_logs')
                 .insert([{ item_name: item, quantity: q, issued_to: person }]);
 
             if (error) {
-                alert("Помилка: " + error.message);
+                alert("Помилка при збереженні: " + error.message);
             } else {
                 alert("Успішно додано!");
-                location.reload();
+                document.getElementById('itemName').value = '';
+                document.getElementById('qty').value = '';
+                document.getElementById('issuedTo').value = '';
+                loadLogs();
             }
         }
 
         async function loadLogs() {
-            const { data, error } = await supabase.from('inventory_logs').select('*').order('date', {ascending: false});
+            const { data, error } = await supabase
+                .from('inventory_logs')
+                .select('*')
+                .order('created_at', { ascending: false });
+
             const list = document.getElementById('logList');
-            if(data) {
+            if (error) {
+                list.innerHTML = `<p class="text-red-500">Помилка завантаження: ${error.message}</p>`;
+                return;
+            }
+            if (data) {
                 list.innerHTML = data.map(l => `
-                    <div class="border-b pb-1">
-                        <span class="font-bold">${l.item_name}</span>: ${l.quantity} шт. (${l.issued_to || '---'})
+                    <div class="border-b pb-2 flex justify-between">
+                        <span><b class="text-black">${l.item_name}</b>: ${l.quantity} шт.</span>
+                        <span class="text-gray-400 italic">${l.issued_to || '---'}</span>
                     </div>
                 `).join('');
             }
