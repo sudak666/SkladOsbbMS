@@ -3,86 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Журнал Складу</title>
+    <title>Склад ОСББ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .tab-active { background: #1d4ed8; color: white; }
+        .low-stock { background: #fef2f2; border-left: 3px solid #ef4444; }
+        .zero-stock { opacity: 0.6; }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4">
-    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg">
-        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">📝 Журнал Складу</h1>
-        
-        <div class="space-y-3 mb-8">
-            <input type="text" id="itemName" placeholder="Найменування товару" class="w-full border p-2 rounded-lg">
-            <input type="number" id="qty" placeholder="Кількість" class="w-full border p-2 rounded-lg">
-            <input type="text" id="issuedTo" placeholder="Кому видано" class="w-full border p-2 rounded-lg">
-            <button id="saveBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Зберегти запис</button>
+<body class="bg-gray-100 min-h-screen">
+
+<div class="max-w-lg mx-auto">
+    <!-- Шапка -->
+    <div class="bg-blue-700 text-white p-4 sticky top-0 z-10 shadow">
+        <h1 class="text-xl font-bold text-center">🏪 Склад ОСББ</h1>
+        <!-- Вкладки -->
+        <div class="flex mt-3 gap-1">
+            <button onclick="switchTab('items')" id="tab-items" class="tab-active flex-1 py-1.5 rounded-lg text-sm font-medium transition">📦 Товари</button>
+            <button onclick="switchTab('issue')" id="tab-issue" class="flex-1 py-1.5 rounded-lg text-sm font-medium bg-blue-600 transition">➡️ Видача</button>
+            <button onclick="switchTab('log')" id="tab-log" class="flex-1 py-1.5 rounded-lg text-sm font-medium bg-blue-600 transition">📋 Журнал</button>
+            <button onclick="switchTab('add')" id="tab-add" class="flex-1 py-1.5 rounded-lg text-sm font-medium bg-blue-600 transition">➕ Додати</button>
         </div>
-        <h2 class="text-lg font-bold mb-3">Останні записи:</h2>
-        <div id="logList" class="space-y-2 text-sm text-gray-600"></div>
     </div>
-    <script>
-        // ✅ Правильний спосіб для CDN — через window.supabase
-        const { createClient } = window.supabase;
-        const db = createClient(
-            'https://vkwkyhjjjmcpmiakxohw.supabase.co', 
-            'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9'
-        );
 
-        document.getElementById('saveBtn').addEventListener('click', async () => {
-            const item = document.getElementById('itemName').value.trim();
-            const q = parseInt(document.getElementById('qty').value);
-            const person = document.getElementById('issuedTo').value.trim();
+    <!-- ВКЛАДКА: Товари -->
+    <div id="page-items" class="p-3">
+        <!-- Фільтр категорій -->
+        <div class="flex gap-1 flex-wrap mb-3">
+            <button onclick="filterCat('')" class="cat-btn px-2 py-1 text-xs rounded-full bg-blue-600 text-white font-bold" data-cat="">Всі</button>
+            <button onclick="filterCat('Прибирання')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Прибирання">🧹 Прибирання</button>
+            <button onclick="filterCat('Ремонт')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Ремонт">🔧 Ремонт</button>
+            <button onclick="filterCat('Електрика')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Електрика">⚡ Електрика</button>
+            <button onclick="filterCat('Сантехніка')" class="cat-btn px-2 py-1 text-xs rounded-full bg-gray-200" data-cat="Сантехніка">🚿 Сантехніка</button>
+        </div>
+        <input id="searchInput" oninput="renderItems()" placeholder="🔍 Пошук товару..." class="w-full border p-2 rounded-lg mb-3 text-sm">
+        <div id="itemsList" class="space-y-2"></div>
+    </div>
 
-            if (!item || !q) return alert("Заповніть назву та кількість!");
+    <!-- ВКЛАДКА: Видача -->
+    <div id="page-issue" class="p-3 hidden">
+        <div class="bg-white rounded-xl shadow p-4 space-y-3">
+            <h2 class="font-bold text-gray-700 text-lg">➡️ Видача зі складу</h2>
+            <select id="issueItem" class="w-full border p-2 rounded-lg text-sm">
+                <option value="">— Оберіть товар —</option>
+            </select>
+            <div id="issueStock" class="text-sm text-gray-500 hidden">Залишок: <span id="issueStockVal" class="font-bold text-blue-600"></span></div>
+            <input type="number" id="issueQty" placeholder="Кількість" min="1" class="w-full border p-2 rounded-lg">
+            <input type="text" id="issuePerson" placeholder="Кому видано (ПІБ або посада)" class="w-full border p-2 rounded-lg">
+            <button onclick="issueItem()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Видати</button>
+        </div>
+    </div>
 
-            const { error } = await db
-                .from('inventory_logs')
-                .insert([{ item_name: item, quantity: q, issued_to: person }]);
+    <!-- ВКЛАДКА: Журнал -->
+    <div id="page-log" class="p-3 hidden">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-gray-700">📋 Журнал видач</h2>
+            <select id="logFilter" onchange="loadLogs()" class="border text-sm p-1 rounded">
+                <option value="">Всі</option>
+                <option value="Прибирання">🧹 Прибирання</option>
+                <option value="Ремонт">🔧 Ремонт</option>
+                <option value="Електрика">⚡ Електрика</option>
+                <option value="Сантехніка">🚿 Сантехніка</option>
+            </select>
+        </div>
+        <div id="logList" class="space-y-2 text-sm"></div>
+    </div>
 
-            if (error) {
-                alert("Помилка: " + error.message);
-            } else {
-                alert("Успішно збережено!");
-                document.getElementById('itemName').value = '';
-                document.getElementById('qty').value = '';
-                document.getElementById('issuedTo').value = '';
-                loadLogs();
-            }
-        });
+    <!-- ВКЛАДКА: Додати товар -->
+    <div id="page-add" class="p-3 hidden">
+        <div class="bg-white rounded-xl shadow p-4 space-y-3">
+            <h2 class="font-bold text-gray-700 text-lg">➕ Додати / Поповнити</h2>
+            <!-- Поповнення існуючого -->
+            <div class="border rounded-lg p-3 space-y-2">
+                <p class="text-sm font-bold text-gray-600">📦 Поповнити існуючий товар</p>
+                <select id="refillItem" class="w-full border p-2 rounded-lg text-sm">
+                    <option value="">— Оберіть товар —</option>
+                </select>
+                <input type="number" id="refillQty" placeholder="Кількість для поповнення" min="1" class="w-full border p-2 rounded-lg">
+                <button onclick="refillItem()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700">Поповнити</button>
+            </div>
+            <!-- Новий товар -->
+            <div class="border rounded-lg p-3 space-y-2">
+                <p class="text-sm font-bold text-gray-600">🆕 Новий товар</p>
+                <input type="text" id="newName" placeholder="Назва товару" class="w-full border p-2 rounded-lg text-sm">
+                <select id="newCat" class="w-full border p-2 rounded-lg text-sm">
+                    <option value="Прибирання">🧹 Прибирання</option>
+                    <option value="Ремонт">🔧 Ремонт</option>
+                    <option value="Електрика">⚡ Електрика</option>
+                    <option value="Сантехніка">🚿 Сантехніка</option>
+                    <option value="Інше">📦 Інше</option>
+                </select>
+                <input type="text" id="newUnit" placeholder="Одиниця виміру (штук, уп., м.п.)" class="w-full border p-2 rounded-lg text-sm">
+                <input type="number" id="newQty" placeholder="Початкова кількість" min="0" class="w-full border p-2 rounded-lg text-sm">
+                <button onclick="addNewItem()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Додати товар</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        async function loadLogs() {
-            const { data, error } = await db
-                .from('inventory_logs')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(20);
+<script>
+const { createClient } = window.supabase;
+const db = createClient(
+    'https://vkwkyhjjjmcpmiakxohw.supabase.co',
+    'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9'
+);
 
-            const list = document.getElementById('logList');
-            if (error) {
-                list.innerHTML = `<p class="text-red-500">Помилка завантаження: ${error.message}</p>`;
-                return;
-            }
-            if (!data || data.length === 0) {
-                list.innerHTML = '<p class="text-gray-400">Записів ще немає.</p>';
-                return;
-            }
-            list.innerHTML = data.map(l => {
-                const date = new Date(l.created_at).toLocaleString('uk-UA', {
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
-                });
-                return `
-                    <div class="border-b pb-2">
-                        <span class="font-bold text-gray-800">${l.item_name}</span>: 
-                        ${l.quantity} шт.
-                        ${l.issued_to ? `→ <span class="text-blue-600">${l.issued_to}</span>` : ''}
-                        <div class="text-xs text-gray-400">${date}</div>
-                    </div>
-                `;
-            }).join('');
+let allItems = [];
+let currentCat = '';
+
+// ===== ВКЛАДКИ =====
+function switchTab(tab) {
+    ['items','issue','log','add'].forEach(t => {
+        document.getElementById('page-'+t).classList.add('hidden');
+        document.getElementById('tab-'+t).classList.remove('tab-active');
+        document.getElementById('tab-'+t).classList.add('bg-blue-600');
+    });
+    document.getElementById('page-'+tab).classList.remove('hidden');
+    document.getElementById('tab-'+tab).classList.add('tab-active');
+    document.getElementById('tab-'+tab).classList.remove('bg-blue-600');
+    if (tab === 'log') loadLogs();
+    if (tab === 'issue' || tab === 'add') populateSelects();
+}
+
+// ===== ТОВАРИ =====
+async function loadItems() {
+    const { data } = await db.from('inventory_items').select('*').order('category').order('name');
+    if (data) { allItems = data; renderItems(); }
+}
+
+function filterCat(cat) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => {
+        b.classList.toggle('bg-blue-600', b.dataset.cat === cat);
+        b.classList.toggle('text-white', b.dataset.cat === cat);
+        b.classList.toggle('bg-gray-200', b.dataset.cat !== cat);
+    });
+    renderItems();
+}
+
+function renderItems() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    let items = allItems;
+    if (currentCat) items = items.filter(i => i.category === currentCat);
+    if (search) items = items.filter(i => i.name.toLowerCase().includes(search));
+
+    const catColors = { 'Прибирання':'bg-green-100 text-green-700', 'Ремонт':'bg-orange-100 text-orange-700', 'Електрика':'bg-yellow-100 text-yellow-700', 'Сантехніка':'bg-blue-100 text-blue-700', 'Інше':'bg-gray-100 text-gray-700' };
+
+    document.getElementById('itemsList').innerHTML = items.length ? items.map(i => `
+        <div class="bg-white rounded-lg shadow-sm p-3 ${i.quantity == 0 ? 'zero-stock' : ''} ${i.quantity > 0 && i.quantity <= 2 ? 'low-stock' : ''}">
+            <div class="flex justify-between items-start gap-2">
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800 leading-tight">${i.name}</p>
+                    <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block ${catColors[i.category] || 'bg-gray-100 text-gray-600'}">${i.category}</span>
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="font-bold text-lg ${i.quantity == 0 ? 'text-red-500' : 'text-blue-700'}">${i.quantity}</p>
+                    <p class="text-xs text-gray-400">${i.unit}</p>
+                </div>
+            </div>
+        </div>
+    `).join('') : '<p class="text-center text-gray-400 py-8">Нічого не знайдено</p>';
+}
+
+// ===== ЗАПОВНЕННЯ СЕЛЕКТІВ =====
+function populateSelects() {
+    const opts = allItems.map(i => `<option value="${i.id}" data-qty="${i.quantity}" data-unit="${i.unit}">${i.name} (${i.quantity} ${i.unit})</option>`).join('');
+    document.getElementById('issueItem').innerHTML = '<option value="">— Оберіть товар —</option>' + opts;
+    document.getElementById('refillItem').innerHTML = '<option value="">— Оберіть товар —</option>' + opts;
+    document.getElementById('issueItem').onchange = function() {
+        const opt = this.options[this.selectedIndex];
+        if (this.value) {
+            document.getElementById('issueStock').classList.remove('hidden');
+            document.getElementById('issueStockVal').textContent = opt.dataset.qty + ' ' + opt.dataset.unit;
+        } else {
+            document.getElementById('issueStock').classList.add('hidden');
         }
+    };
+}
 
-        loadLogs();
-    </script>
+// ===== ВИДАЧА =====
+async function issueItem() {
+    const sel = document.getElementById('issueItem');
+    const itemId = parseInt(sel.value);
+    const qty = parseFloat(document.getElementById('issueQty').value);
+    const person = document.getElementById('issuePerson').value.trim();
+    if (!itemId) return alert('Оберіть товар!');
+    if (!qty || qty <= 0) return alert('Вкажіть кількість!');
+    if (!person) return alert('Вкажіть кому видано!');
+
+    const item = allItems.find(i => i.id === itemId);
+    if (item.quantity < qty) return alert(`Недостатньо на складі! Залишок: ${item.quantity} ${item.unit}`);
+
+    const newQty = item.quantity - qty;
+    const { error: e1 } = await db.from('inventory_items').update({ quantity: newQty }).eq('id', itemId);
+    const { error: e2 } = await db.from('inventory_logs').insert([{ item_id: itemId, item_name: item.name, quantity: qty, issued_to: person }]);
+
+    if (e1 || e2) return alert('Помилка: ' + (e1?.message || e2?.message));
+
+    alert(`✅ Видано: ${qty} ${item.unit} → ${person}`);
+    document.getElementById('issueQty').value = '';
+    document.getElementById('issuePerson').value = '';
+    document.getElementById('issueItem').value = '';
+    document.getElementById('issueStock').classList.add('hidden');
+    await loadItems();
+    populateSelects();
+}
+
+// ===== ПОПОВНЕННЯ =====
+async function refillItem() {
+    const itemId = parseInt(document.getElementById('refillItem').value);
+    const qty = parseFloat(document.getElementById('refillQty').value);
+    if (!itemId) return alert('Оберіть товар!');
+    if (!qty || qty <= 0) return alert('Вкажіть кількість!');
+
+    const item = allItems.find(i => i.id === itemId);
+    const newQty = item.quantity + qty;
+    const { error } = await db.from('inventory_items').update({ quantity: newQty }).eq('id', itemId);
+    if (error) return alert('Помилка: ' + error.message);
+
+    alert(`✅ Поповнено: +${qty} ${item.unit}`);
+    document.getElementById('refillQty').value = '';
+    await loadItems();
+    populateSelects();
+}
+
+// ===== НОВИЙ ТОВАР =====
+async function addNewItem() {
+    const name = document.getElementById('newName').value.trim();
+    const category = document.getElementById('newCat').value;
+    const unit = document.getElementById('newUnit').value.trim() || 'штук';
+    const quantity = parseFloat(document.getElementById('newQty').value) || 0;
+    if (!name) return alert('Введіть назву товару!');
+
+    const { error } = await db.from('inventory_items').insert([{ name, category, unit, quantity }]);
+    if (error) return alert('Помилка: ' + error.message);
+
+    alert(`✅ Товар "${name}" додано!`);
+    document.getElementById('newName').value = '';
+    document.getElementById('newUnit').value = '';
+    document.getElementById('newQty').value = '';
+    await loadItems();
+}
+
+// ===== ЖУРНАЛ =====
+async function loadLogs() {
+    const { data } = await db.from('inventory_logs').select('*').order('issued_at', { ascending: false }).limit(50);
+    const list = document.getElementById('logList');
+    if (!data || !data.length) { list.innerHTML = '<p class="text-center text-gray-400 py-8">Записів немає</p>'; return; }
+
+    list.innerHTML = data.map(l => {
+        const date = new Date(l.issued_at).toLocaleString('uk-UA', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        return `
+        <div class="bg-white rounded-lg p-3 shadow-sm">
+            <p class="font-medium text-sm text-gray-800">${l.item_name}</p>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+                <span>📤 <b>${l.quantity}</b> → ${l.issued_to || '---'}</span>
+                <span>${date}</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ===== СТАРТ =====
+loadItems();
+</script>
 </body>
 </html>
