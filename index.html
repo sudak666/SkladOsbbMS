@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
-
     <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg">
         <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">📝 Журнал Складу</h1>
         
@@ -18,58 +17,71 @@
             <input type="text" id="issuedTo" placeholder="Кому видано" class="w-full border p-2 rounded-lg">
             <button id="saveBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Зберегти запис</button>
         </div>
-
         <h2 class="text-lg font-bold mb-3">Останні записи:</h2>
         <div id="logList" class="space-y-2 text-sm text-gray-600"></div>
     </div>
-
     <script>
-        // Ініціалізація один раз
-        const supabase = supabase.createClient(
+        // ✅ Правильний спосіб для CDN — через window.supabase
+        const { createClient } = window.supabase;
+        const db = createClient(
             'https://vkwkyhjjjmcpmiakxohw.supabase.co', 
             'sb_publishable_KV2ZYS0ELpHPO9cX10Z9Tw_veUObkM9'
         );
 
-        // Використовуємо addEventListener замість onclick в HTML (це надійніше)
         document.getElementById('saveBtn').addEventListener('click', async () => {
-            const item = document.getElementById('itemName').value;
+            const item = document.getElementById('itemName').value.trim();
             const q = parseInt(document.getElementById('qty').value);
-            const person = document.getElementById('issuedTo').value;
+            const person = document.getElementById('issuedTo').value.trim();
 
-            if(!item || !q) return alert("Заповніть назву та кількість!");
+            if (!item || !q) return alert("Заповніть назву та кількість!");
 
-            const { error } = await supabase
+            const { error } = await db
                 .from('inventory_logs')
                 .insert([{ item_name: item, quantity: q, issued_to: person }]);
 
             if (error) {
                 alert("Помилка: " + error.message);
             } else {
-                alert("Успішно!");
+                alert("Успішно збережено!");
                 document.getElementById('itemName').value = '';
                 document.getElementById('qty').value = '';
                 document.getElementById('issuedTo').value = '';
-                loadLogs(); // Оновлюємо список
+                loadLogs();
             }
         });
 
         async function loadLogs() {
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from('inventory_logs')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .limit(20);
 
             const list = document.getElementById('logList');
-            if(data) {
-                list.innerHTML = data.map(l => `
-                    <div class="border-b pb-1">
-                        <span class="font-bold">${l.item_name}</span>: ${l.quantity} шт. (${l.issued_to || '---'})
-                    </div>
-                `).join('');
+            if (error) {
+                list.innerHTML = `<p class="text-red-500">Помилка завантаження: ${error.message}</p>`;
+                return;
             }
+            if (!data || data.length === 0) {
+                list.innerHTML = '<p class="text-gray-400">Записів ще немає.</p>';
+                return;
+            }
+            list.innerHTML = data.map(l => {
+                const date = new Date(l.created_at).toLocaleString('uk-UA', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+                return `
+                    <div class="border-b pb-2">
+                        <span class="font-bold text-gray-800">${l.item_name}</span>: 
+                        ${l.quantity} шт.
+                        ${l.issued_to ? `→ <span class="text-blue-600">${l.issued_to}</span>` : ''}
+                        <div class="text-xs text-gray-400">${date}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        // Запуск
         loadLogs();
     </script>
 </body>
