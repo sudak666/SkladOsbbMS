@@ -9,40 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-// ===== PIN AUTH =====
-const PIN = '1234';
-let pinEntered = '';
-function pinPress(k) {
-  if (k === 'C') { pinEntered = ''; }
-  else if (k === 'DEL') { pinEntered = pinEntered.slice(0,-1); }
-  else if (pinEntered.length < 4) { pinEntered += k; }
-  // update dots
-  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled', i<pinEntered.length);
-  document.getElementById('authErr').textContent = '';
-  if (pinEntered.length === 4) {
-    if (pinEntered === PIN) {
-      document.getElementById('authScreen').style.opacity='0';
-      document.getElementById('authScreen').style.transition='opacity .4s';
-      setTimeout(()=>{ document.getElementById('authScreen').style.display='none'; },400);
-      sessionStorage.setItem('auth','ok');
-    } else {
-      document.getElementById('authErr').textContent = '❌ Невірний PIN-код';
-      pinEntered = '';
-      for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
-    }
-  }
-}
-// skip auth if already passed in this session
-document.addEventListener('DOMContentLoaded',function(){
-  if(sessionStorage.getItem('auth')==='ok') {
-    const s=document.getElementById('authScreen');
-    if(s) s.style.display='none';
-  }
-});
 
-
-</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 *{font-family:'Inter',sans-serif;box-sizing:border-box;}
