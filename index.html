@@ -165,11 +165,11 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
 
 <div class="main">
   <div class="topbar">
-    <h2 id="pageTitle">📦 Товари на складі</h2>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span id="lastUpdate" style="font-size:12px;color:#a5b4fc;"></span>
-      <button class="btn btn-excel btn-sm" onclick="exportExcel()">📤 Excel</button>
-      <button class="btn btn-ghost btn-sm" onclick="refreshAll()">🔄 Оновити</button>
+    <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;">📦 Товари на складі</h2>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+      <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
+      <button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="white-space:nowrap;">🔄 Оновити</button>
     </div>
   </div>
 
@@ -184,7 +184,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
       <div class="stat-card sc-orange"><div class="big" id="st-low">—</div><div class="lbl">⚠️ Мало залишилось</div></div>
       <div class="stat-card sc-green"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div></div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills" class="pills-wrap">
         <button class="pill active" onclick="filterCat(this,'')">Всі</button>
         <button class="pill" onclick="filterCat(this,'Прибирання')">🧹 Прибирання</button>
@@ -194,7 +194,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
         <button class="pill" onclick="filterCat(this,'Відеоспостереження')">📹 Відео</button>
         <button class="pill" onclick="filterCat(this,'Інше')">📦 Інше</button>
       </div>
-      <div class="sw" style="width:250px;"><span class="si">🔍</span><input class="inp" id="searchInp" placeholder="Пошук..." oninput="renderItems()"></div>
+      <div class="sw" style="width:250px;min-width:160px;"><span class="si">🔍</span><input class="inp" id="searchInp" placeholder="Пошук..." oninput="renderItems()"></div>
     </div>
     <div class="card desktop-table" style="overflow:hidden;">
       <table>
@@ -234,7 +234,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
 
   <!-- LOG -->
   <div id="page-log" class="page">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;" class="pills-wrap">
         <button class="pill active" onclick="filterLogCat(this,'')">Всі</button>
         <button class="pill" onclick="filterLogCat(this,'Прибирання')">🧹</button>
