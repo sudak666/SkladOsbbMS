@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 *{font-family:'Inter',sans-serif;box-sizing:border-box;}
@@ -140,9 +142,75 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
 .m-card-actions{display:flex;gap:6px;margin-top:10px;}
 .m-card-actions .btn{flex:1;justify-content:center;padding:9px 10px;font-size:13px;}
 
+
+/* ===AUTH SCREEN=== */
+#authScreen{position:fixed;inset:0;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);display:flex;align-items:center;justify-content:center;z-index:200;}
+.auth-box{background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:40px 36px;width:340px;text-align:center;}
+.auth-box h1{color:#fff;font-size:22px;font-weight:800;margin-bottom:4px;}
+.auth-box p{color:#a5b4fc;font-size:13px;margin-bottom:28px;}
+.auth-inp{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:14px 16px;font-size:18px;color:#fff;text-align:center;letter-spacing:8px;outline:none;margin-bottom:16px;}
+.auth-inp::placeholder{letter-spacing:2px;color:rgba(255,255,255,.4);font-size:14px;}
+.auth-inp:focus{border-color:#818cf8;background:rgba(255,255,255,.15);}
+.auth-err{color:#fca5a5;font-size:13px;margin-top:-8px;margin-bottom:12px;min-height:20px;}
+.auth-btn{width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,.5);}
+.auth-dots{display:flex;gap:8px;justify-content:center;margin-bottom:20px;}
+.auth-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .2s;}
+.auth-dot.filled{background:#818cf8;}
+.pin-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+.pin-key{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:16px;font-size:20px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.pin-key:active{background:rgba(99,102,241,.4);transform:scale(.94);}
+
+/* ===QR MODAL=== */
+#qrModal .modal{width:360px;}
+#qrReader{width:100%;border-radius:12px;overflow:hidden;background:#000;}
+#qrReader video{width:100%!important;}
+.qr-result{background:#f0f0ff;border-radius:10px;padding:12px;margin-top:12px;font-size:13px;color:#4338ca;font-weight:600;display:none;}
+
+/* ===HISTORY MODAL=== */
+#histModal .modal{width:500px;max-height:80vh;overflow-y:auto;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:13px;}
+.hist-row:last-child{border-bottom:none;}
+.hist-out{color:#ef4444;font-weight:700;}
+.hist-in{color:#10b981;font-weight:700;}
+
+/* ===CHART=== */
+#chartModal .modal{width:600px;}
+canvas#stockChart{width:100%!important;max-height:300px;}
+
 </style>
 </head>
 <body>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+    <h1>Склад ОСББ</h1>
+    <p>Микитська Слобода</p>
+    <div class="auth-dots" id="authDots">
+      <div class="auth-dot" id="d0"></div>
+      <div class="auth-dot" id="d1"></div>
+      <div class="auth-dot" id="d2"></div>
+      <div class="auth-dot" id="d3"></div>
+    </div>
+    <div class="auth-err" id="authErr"></div>
+    <div class="pin-keys">
+      <div class="pin-key" onclick="pinPress('1')">1</div>
+      <div class="pin-key" onclick="pinPress('2')">2</div>
+      <div class="pin-key" onclick="pinPress('3')">3</div>
+      <div class="pin-key" onclick="pinPress('4')">4</div>
+      <div class="pin-key" onclick="pinPress('5')">5</div>
+      <div class="pin-key" onclick="pinPress('6')">6</div>
+      <div class="pin-key" onclick="pinPress('7')">7</div>
+      <div class="pin-key" onclick="pinPress('8')">8</div>
+      <div class="pin-key" onclick="pinPress('9')">9</div>
+      <div class="pin-key" style="font-size:14px;" onclick="pinPress('C')">✕</div>
+      <div class="pin-key" onclick="pinPress('0')">0</div>
+      <div class="pin-key" style="font-size:14px;" onclick="pinPress('DEL')">⌫</div>
+    </div>
+  </div>
+</div>
 
 <div class="sidebar">
   <div class="sb-logo">
@@ -168,7 +236,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
     <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;">📦 Товари на складі</h2>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
-      <button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
+      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік">📊</button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер">📷</button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
       <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="white-space:nowrap;">🔄 Оновити</button>
     </div>
   </div>
@@ -354,6 +422,38 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="this.classList.remove('open')">
   <img id="lbImg" src="" alt="" style="max-width:90vw;max-height:90vh;border-radius:12px;">
+</div>
+
+<!-- QR SCANNER MODAL -->
+<div class="modal-bg" id="qrModal" onclick="closeModal('qrModal',event)">
+  <div class="modal">
+    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:14px;">📷 Сканер штрих-коду</h3>
+    <div id="qrReader"></div>
+    <div class="qr-result" id="qrResult"></div>
+    <p style="font-size:12px;color:#a5b4fc;margin-top:10px;text-align:center;">Наведіть камеру на штрих-код або QR-код товару</p>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="stopQR();closeModal('qrModal')">Закрити</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-bg" id="histModal" onclick="closeModal('histModal',event)">
+  <div class="modal">
+    <h3 id="histTitle" style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:4px;"></h3>
+    <p id="histSubtitle" style="font-size:12px;color:#a5b4fc;margin-bottom:16px;"></p>
+    <div id="histList"></div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="closeModal('histModal')">Закрити</button>
+  </div>
+</div>
+
+<!-- CHART MODAL -->
+<div class="modal-bg" id="chartModal" onclick="closeModal('chartModal',event)">
+  <div class="modal">
+    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:16px;">📊 Залишки по категоріях</h3>
+    <canvas id="stockChart"></canvas>
+    <button class="btn btn-ghost btn-sm" style="margin-top:16px;" onclick="closeModal('chartModal')">Закрити</button>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -701,10 +801,123 @@ function toast(msg,type=''){
   clearTimeout(toastT);toastT=setTimeout(()=>el.className='',3200);
 }
 
+
+// ===== PIN AUTH =====
+const PIN = '1234';
+let pinEntered = '';
+function pinPress(k) {
+  if (k === 'C') { pinEntered = ''; }
+  else if (k === 'DEL') { pinEntered = pinEntered.slice(0,-1); }
+  else if (pinEntered.length < 4) { pinEntered += k; }
+  // update dots
+  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled', i<pinEntered.length);
+  document.getElementById('authErr').textContent = '';
+  if (pinEntered.length === 4) {
+    if (pinEntered === PIN) {
+      document.getElementById('authScreen').style.opacity='0';
+      document.getElementById('authScreen').style.transition='opacity .4s';
+      setTimeout(()=>{ document.getElementById('authScreen').style.display='none'; },400);
+      sessionStorage.setItem('auth','ok');
+    } else {
+      document.getElementById('authErr').textContent = '❌ Невірний PIN-код';
+      pinEntered = '';
+      for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
+    }
+  }
+}
+// skip auth if already passed in this session
+if(sessionStorage.getItem('auth')==='ok') {
+  document.getElementById('authScreen').style.display='none';
+}
+
+// ===== QR SCANNER =====
+let qrScanner = null;
+function openQR() {
+  document.getElementById('qrModal').classList.add('open');
+  document.getElementById('qrResult').style.display='none';
+  setTimeout(()=>{
+    qrScanner = new Html5Qrcode('qrReader');
+    qrScanner.start(
+      {facingMode:'environment'},
+      {fps:10, qrbox:{width:220,height:220}},
+      (decoded)=>{
+        document.getElementById('qrResult').style.display='block';
+        document.getElementById('qrResult').textContent='✅ Зчитано: '+decoded;
+        // search item by name fragment
+        const found = allItems.find(i=>i.name.toLowerCase().includes(decoded.toLowerCase())||decoded.includes(String(i.id)));
+        if(found){ stopQR(); closeModal('qrModal'); openQuick(found.id); }
+      },
+      ()=>{}
+    ).catch(e=>{ document.getElementById('qrResult').style.display='block'; document.getElementById('qrResult').textContent='⚠️ Камера недоступна: '+e; });
+  },300);
+}
+function stopQR(){
+  if(qrScanner){ qrScanner.stop().catch(()=>{}); qrScanner=null; }
+  const el=document.getElementById('qrReader'); if(el) el.innerHTML='';
+}
+
+// ===== ITEM HISTORY =====
+async function openHistory(itemId) {
+  const item = allItems.find(i=>i.id===itemId);
+  document.getElementById('histTitle').textContent = item.name;
+  document.getElementById('histSubtitle').textContent = 'Поточний залишок: '+item.quantity+' '+item.unit;
+  document.getElementById('histList').innerHTML = '<div style="text-align:center;color:#a5b4fc;padding:20px;">Завантаження...</div>';
+  document.getElementById('histModal').classList.add('open');
+  const {data} = await db.from('inventory_logs').select('*').eq('item_id', itemId).order('issued_at',{ascending:false}).limit(30);
+  if (!data || !data.length) {
+    document.getElementById('histList').innerHTML = '<div style="text-align:center;color:#a5b4fc;padding:20px;">Видач не було</div>';
+    return;
+  }
+  document.getElementById('histList').innerHTML = data.map(l=>{
+    const d = new Date(l.issued_at).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const t = new Date(l.issued_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    return '<div class="hist-row">'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-weight:600;color:#1e1b4b;">'+(l.issued_to||'—')+'</div>'
+        +'<div style="font-size:11px;color:#a5b4fc;">'+d+' '+t+(l.note?' · '+l.note:'')+'</div>'
+      +'</div>'
+      +'<div class="hist-out">−'+l.quantity+' '+item.unit+'</div>'
+    +'</div>';
+  }).join('');
+}
+
+// ===== CHART =====
+let chartInst = null;
+function openChartModal() {
+  document.getElementById('chartModal').classList.add('open');
+  setTimeout(renderChart, 100);
+}
+function renderChart() {
+  const ctx = document.getElementById('stockChart').getContext('2d');
+  if (chartInst) { chartInst.destroy(); chartInst=null; }
+  const cats = [...new Set(allItems.map(i=>i.category))];
+  const data = cats.map(c=>allItems.filter(i=>i.category===c).reduce((s,i)=>s+(+i.quantity),0));
+  const colors = cats.map(c=>catColor[c]||'#64748b');
+  chartInst = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: cats.map(c=>(catIcon[c]||'')+'\n'+c),
+      datasets:[{
+        label:'Загальна к-сть',
+        data,
+        backgroundColor: colors.map(c=>c+'cc'),
+        borderColor: colors,
+        borderWidth:2,
+        borderRadius:8,
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Кількість: '+ctx.parsed.y}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#f0eeff'}},x:{grid:{display:false}}}
+    }
+  });
+}
+
 document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['qModal','photoModal','delModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
+    ['qModal','photoModal','delModal','histModal','chartModal'].forEach(id=>document.getElementById(id).classList.remove('open')); stopQR();
     document.getElementById('lightbox').classList.remove('open');
   }
 });
