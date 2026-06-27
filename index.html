@@ -852,7 +852,12 @@ function openQR() {
   },300);
 }
 function stopQR(){
-  if(qrScanner){ qrScanner.stop().catch(()=>{}); qrScanner=null; }
+  if(qrScanner){
+    try{
+      if(qrScanner.isScanning) qrScanner.stop().catch(()=>{});
+    }catch(e){}
+    qrScanner=null;
+  }
   const el=document.getElementById('qrReader'); if(el) el.innerHTML='';
 }
 
