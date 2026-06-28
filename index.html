@@ -2,7 +2,14 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#312e81">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Склад ОСББ">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Склад ОСББ</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -171,20 +178,24 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   #page-add,#page-stats{overflow-y:auto;}
   .stats-grid{grid-template-columns:1fr!important;}
   .bn-item{font-size:9px;}
-  .bn-icon{font-size:18px;}
-  .bottom-nav{height:60px;}
-  .main{padding-bottom:68px;}
+  .bn-icon-wrap{width:36px;height:26px;}
+  .bn-icon{font-size:17px;}
+  .bottom-nav{height:62px;}
+  .main{padding-bottom:70px;}
   .stats-grid{grid-template-columns:1fr!important;}
   #statCats .pbar{height:5px;}
 }
 
 /* ===BOTTOM NAV (mobile only)=== */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,#1e1b4b,#312e81);z-index:30;height:64px;align-items:stretch;border-top:1px solid rgba(255,255,255,.1);box-shadow:0 -4px 20px rgba(99,102,241,.3);}
-.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#a5b4fc;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;padding:4px 0;position:relative;}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#a5b4fc;font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;padding:6px 0;position:relative;-webkit-tap-highlight-color:transparent;}
 .bn-item.active{color:#fff;}
-.bn-item.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;}
-.bn-icon{font-size:20px;line-height:1;}
-.bn-badge{position:absolute;top:6px;right:calc(50% - 16px);background:#ef4444;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;}
+.bn-item.active .bn-icon-wrap{background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 12px rgba(99,102,241,.5);}
+.bn-item.active::after{content:'';position:absolute;bottom:0;left:25%;right:25%;height:2px;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;}
+.bn-icon-wrap{width:40px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:transparent;}
+.bn-icon{font-size:18px;line-height:1;}
+.bn-badge{position:absolute;top:4px;right:calc(50% - 18px);background:#ef4444;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;box-shadow:0 2px 6px rgba(239,68,68,.4);}
+.bn-label{font-size:9.5px;letter-spacing:.01em;}
 
 /* Mobile item card */
 .m-card{background:#fff;border-radius:12px;border:1px solid rgba(99,102,241,.1);padding:12px;margin-bottom:9px;box-shadow:0 1px 6px rgba(99,102,241,.06);}
@@ -414,7 +425,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
   <div id="page-stats" class="page">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;" class="stats-grid">
       <div class="card" style="padding:18px;"><div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:14px;">📊 По категоріях</div><div id="statCats" style="display:flex;flex-direction:column;gap:12px;"></div></div>
-      <div class="card" style="padding:18px;"><div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;margin-bottom:14px;">🔔 Потребують поповнення</div><div id="statLow"></div></div>
+      <div class="card" style="padding:18px;overflow:hidden;"><div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;margin-bottom:14px;">🔔 Потребують поповнення</div><div id="statLow" style="overflow:hidden;"></div></div>
     </div>
     <div class="card" style="padding:22px;"><div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:16px;">📋 Останні видачі</div><div id="statLog"></div></div>
   </div>
@@ -913,15 +924,15 @@ function renderStats(){
   const low=allItems.filter(i=>i.quantity<=3).sort((a,b)=>a.quantity-b.quantity);
   document.getElementById('statLow').innerHTML=low.length
     ? low.map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13px;">
-        <span style="color:#4b5563;flex:1;margin-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.name}</span>
-        <span class="${i.quantity==0?'qty-zero':'qty-low'}">${i.quantity} ${i.unit}</span>
+        <span style="color:#4b5563;flex:1;margin-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${i.name}</span>
+        <span class="${i.quantity==0?'qty-zero':'qty-low'}" style="flex-shrink:0;white-space:nowrap;">${i.quantity} ${i.unit}</span>
       </div>`).join('')
     : '<div style="color:#10b981;font-weight:600;font-size:13px;">✅ Всі товари в нормі!</div>';
   document.getElementById('statLog').innerHTML=allLogs.slice(0,10).map(l=>{
     const d=new Date(l.issued_at).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f3f4f6;font-size:13px;">
-      <span style="font-weight:600;color:#1e1b4b;flex:1;margin-right:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.item_name}</span>
-      <span style="color:#6b7280;margin-right:12px;white-space:nowrap;">${l.issued_to||'—'}</span>
+      <span style="font-weight:600;color:#1e1b4b;flex:1;min-width:0;margin-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.item_name}</span>
+      <span style="color:#6b7280;margin-right:8px;white-space:nowrap;font-size:12px;">${l.issued_to||'—'}</span>
       <span style="color:#a5b4fc;font-size:11px;white-space:nowrap;">${d}</span>
     </div>`;
   }).join('')||'<div class="empty" style="padding:16px;">Журнал порожній</div>';
@@ -1070,23 +1081,34 @@ loadItems().then(()=>loadLogs());
 
 <!-- BOTTOM NAV (mobile) -->
 <div class="bottom-nav" id="bottomNav">
-  <div class="bn-item active" data-page="items" onclick="nav('items',this,true)">
-    <span class="bn-icon">📦</span><span>Товари</span>
+  <div class="bn-item active" data-page="items" onclick="nav('items',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📦</span></div>
+    <span class="bn-label">Товари</span>
     <span class="bn-badge" id="bn-alert" style="display:none">!</span>
   </div>
-  <div class="bn-item" data-page="issue" onclick="nav('issue',this,true)">
-    <span class="bn-icon">➡️</span><span>Видача</span>
+  <div class="bn-item" data-page="issue" onclick="nav('issue',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📤</span></div>
+    <span class="bn-label">Видача</span>
   </div>
-  <div class="bn-item" data-page="log" onclick="nav('log',this,true)">
-    <span class="bn-icon">📋</span><span>Журнал</span>
+  <div class="bn-item" data-page="log" onclick="nav('log',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">🗒️</span></div>
+    <span class="bn-label">Журнал</span>
   </div>
-  <div class="bn-item" data-page="add" onclick="nav('add',this,true)">
-    <span class="bn-icon">➕</span><span>Додати</span>
+  <div class="bn-item" data-page="add" onclick="nav('add',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">➕</span></div>
+    <span class="bn-label">Додати</span>
   </div>
-  <div class="bn-item" data-page="stats" onclick="nav('stats',this,true)">
-    <span class="bn-icon">📊</span><span>Звіт</span>
+  <div class="bn-item" data-page="stats" onclick="nav('stats',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📊</span></div>
+    <span class="bn-label">Звіт</span>
   </div>
 </div>
 
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
 </body>
 </html>
