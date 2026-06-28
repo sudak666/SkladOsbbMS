@@ -166,6 +166,9 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   .alert-banner{font-size:12px;padding:9px 12px;}
   .bottom-nav{display:flex!important;}
   .two-col{grid-template-columns:1fr!important;}
+  .pc-only{display:none!important;}
+  .page{overflow-x:hidden;}
+  #page-add,#page-stats{overflow-y:auto;}
   .stats-grid{grid-template-columns:1fr!important;}
   .bn-item{font-size:9px;}
   .bn-icon{font-size:18px;}
@@ -258,9 +261,10 @@ canvas#stockChart{width:100%!important;max-height:300px;}
 
 <div class="sidebar">
   <div class="sb-logo">
-    <h1>🏪 Склад</h1>
+    <div style="font-size:32px;margin-bottom:6px;">🏪</div>
+    <h1>Склад ОСББ</h1>
     <p>Микитська Слобода</p>
-    <span class="sb-ver">v3.0</span>
+    <span class="sb-ver">v3.1</span>
   </div>
   <nav>
     <div class="ni active" data-page="items" onclick="nav('items',this)">
@@ -291,10 +295,10 @@ canvas#stockChart{width:100%!important;max-height:300px;}
       <div class="alert-banner">🔔 <span id="alertText"></span> — натисніть щоб переглянути</div>
     </div>
     <div class="g4" style="margin-bottom:22px;">
-      <div class="stat-card sc-purple" onclick="filterByStock('all',this)"><div class="big" id="st-total">—</div><div class="lbl">📦 Всі позиції</div></div>
-      <div class="stat-card sc-red" onclick="filterByStock('zero',this)"><div class="big" id="st-zero">—</div><div class="lbl">❌ Закінчились</div></div>
-      <div class="stat-card sc-orange" onclick="filterByStock('low',this)"><div class="big" id="st-low">—</div><div class="lbl">⚠️ Мало залишилось</div></div>
-      <div class="stat-card sc-green" onclick="filterByStock('ok',this)"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div></div>
+      <div class="stat-card sc-purple" onclick="filterByStock('all',this)"><div class="big" id="st-total">—</div><div class="lbl">📦 Всі позиції</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">📦</div></div>
+      <div class="stat-card sc-red" onclick="filterByStock('zero',this)"><div class="big" id="st-zero">—</div><div class="lbl">❌ Закінчились</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">🚫</div></div>
+      <div class="stat-card sc-orange" onclick="filterByStock('low',this)"><div class="big" id="st-low">—</div><div class="lbl">⚠️ Мало залишилось</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">⚠️</div></div>
+      <div class="stat-card sc-green" onclick="filterByStock('ok',this)"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">✅</div></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills" class="pills-wrap">
@@ -332,7 +336,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
             <div><label>Кількість</label><input type="number" class="inp" id="issueQtyI" min="0.1" step="0.1" placeholder="0"></div>
             <div><label>Дата</label><input type="date" class="inp" id="issueDateI"></div>
           </div>
-          <div><label>Кому видано</label><input type="text" class="inp" id="issuePersonI" placeholder="ПІБ або посада"></div>
+          <div><label>Кому видано</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;"><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Електрик',this)">Електрик</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Сантехнік',this)">Сантехнік</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Двірник',this)">Двірник</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Охорона',this)">Охорона</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Прибиральниця',this)">Прибиральниця</button></div><input type="text" class="inp" id="issuePersonI" placeholder="або введіть вручну..."></div>
           <div><label>Примітка</label><input type="text" class="inp" id="issueNoteI" placeholder="Для якого об'єкту або завдання"></div>
           <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doIssue()">✅ Видати зі складу</button>
         </div>
@@ -388,7 +392,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
           </div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:16px;" class="pc-only">
         <div class="card" style="padding:20px;background:linear-gradient(135deg,#f0f0ff,#ede9fe);">
           <div style="font-size:13px;font-weight:700;color:#4c1d95;margin-bottom:10px;">💡 Підказки</div>
           <ul style="font-size:12.5px;color:#6b21a8;line-height:2.2;list-style:none;padding:0;margin:0;">
@@ -423,7 +427,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     <p style="font-size:13px;color:#6b7280;margin-bottom:18px;">Залишок: <span id="qmQtyShow" style="font-weight:800;color:#6366f1;"></span></p>
     <div style="display:flex;flex-direction:column;gap:13px;">
       <div><label>Кількість</label><input type="number" class="inp" id="qmQtyI" min="0.1" step="0.1"></div>
-      <div><label>Кому видано</label><input type="text" class="inp" id="qmPersonI" placeholder="ПІБ або посада"></div>
+      <div><label>Кому видано</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;"><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Електрик',this)">Електрик</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Сантехнік',this)">Сантехнік</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Двірник',this)">Двірник</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Охорона',this)">Охорона</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Прибиральниця',this)">Прибиральниця</button></div><input type="text" class="inp" id="qmPersonI" placeholder="або введіть вручну..."></div>
       <div style="display:flex;gap:10px;margin-top:4px;">
         <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('qModal')">Скасувати</button>
         <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="doQuickIssue()">✅ Видати</button>
@@ -551,7 +555,7 @@ function nav(page,el){
 
 // ===== LOAD =====
 async function loadItems(){
-  const {data}=await db.from('inventory_items').select('*').order('category').order('name');
+  const {data}=await db.from('inventory_items').select('*').order('category').order('name').limit(500);
   if(data){allItems=data;renderItems();updateStats();checkAlerts();}
   document.getElementById('lastUpdate').textContent='Оновлено: '+new Date().toLocaleTimeString('uk-UA');
 }
@@ -940,6 +944,19 @@ function exportExcel(){
   toast('📤 Excel завантажено!','success');
 }
 
+
+// ===== SET PERSON (role buttons) =====
+function setPerson(name, btn) {
+  // detect which modal is open
+  const qOpen = document.getElementById('qModal').classList.contains('open');
+  const field = document.getElementById(qOpen ? 'qmPersonI' : 'issuePersonI');
+  field.value = name;
+  // highlight active btn
+  btn.closest('div').querySelectorAll('.btn').forEach(b=>b.style.background='');
+  btn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+  btn.style.color = '#fff';
+}
+
 // ===== QR SCANNER =====
 let qrScanner=null;
 function openQR(){
@@ -957,9 +974,9 @@ function openQR(){
         if(found){stopQR();closeModal('qrModal');openQuick(found.id);}
       },
       ()=>{}
-    ).catch(e=>{
+    ).catch(()=>{
       document.getElementById('qrResult').style.display='block';
-      document.getElementById('qrResult').textContent='⚠️ Камера недоступна: '+e;
+      document.getElementById('qrResult').textContent='⚠️ Не вдалось запустити камеру. Перевірте дозволи браузера.';
     });
   },300);
 }
