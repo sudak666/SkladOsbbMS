@@ -184,8 +184,20 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   .bn-icon{font-size:17px;}
   .bottom-nav{height:62px;}
   .main{padding-bottom:70px;}
-  .stats-grid{grid-template-columns:1fr!important;}
   #statCats .pbar{height:5px;}
+  /* Issue page */
+  #page-issue .split{display:flex!important;flex-direction:column!important;gap:12px!important;}
+  #page-issue .card{padding:14px!important;}
+  #page-issue h3{font-size:15px!important;margin-bottom:14px!important;}
+  #page-issue .btn-ghost.btn-sm{font-size:11px!important;padding:5px 8px!important;}
+  /* Log page - hide table, show cards */
+  #page-log .card table{display:none;}
+  #logMobileList{display:block;}
+  /* Add page */
+  #page-add .card{padding:14px!important;}
+  #page-add h3{font-size:15px!important;margin-bottom:14px!important;}
+  #page-add .split{display:flex!important;flex-direction:column!important;}
+  .sw{width:100%!important;}
 }
 
 /* ===BOTTOM NAV (mobile only)=== */
@@ -385,6 +397,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
         <thead><tr><th>Дата</th><th>Товар</th><th>К-сть</th><th>Кому</th><th>Примітка</th></tr></thead>
         <tbody id="logTable"><tr><td colspan="5" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
       </table>
+      <div id="logMobileList" style="display:none;"></div>
     </div>
   </div>
 
@@ -807,7 +820,12 @@ function renderLog(){
   if(logCat) logs=logs.filter(l=>{const it=allItems.find(i=>i.id===l.item_id);return it&&it.category===logCat;});
   if(s) logs=logs.filter(l=>l.item_name.toLowerCase().includes(s)||(l.issued_to||'').toLowerCase().includes(s));
   const tb=document.getElementById('logTable');
-  if(!logs.length){tb.innerHTML='<tr><td colspan="5"><div class="empty">📭 Нічого не знайдено</div></td></tr>';return;}
+  const mb=document.getElementById('logMobileList');
+  if(!logs.length){
+    tb.innerHTML='<tr><td colspan="5"><div class="empty">📭 Нічого не знайдено</div></td></tr>';
+    mb.innerHTML='<div class="empty">📭 Нічого не знайдено</div>';
+    return;
+  }
   tb.innerHTML=logs.map(l=>{
     const d=new Date(l.issued_at);
     const dt=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
@@ -820,6 +838,22 @@ function renderLog(){
       <td style="color:#4b5563;">${l.issued_to||'—'}</td>
       <td style="color:#9ca3af;font-size:12px;">${l.note||'—'}</td>
     </tr>`;
+  }).join('');
+  // mobile cards
+  mb.innerHTML=logs.map(l=>{
+    const d=new Date(l.issued_at);
+    const dt=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    const item=allItems.find(i=>i.id===l.item_id);
+    const cat=item?item.category:'';
+    const icon=catIcon[cat]||'📦';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f3f4f6;">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ede9fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;color:#1e1b4b;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.item_name}</div>
+        <div style="font-size:11px;color:#a5b4fc;margin-top:1px;">${l.issued_to||'—'} · ${dt}${l.note?' · '+l.note:''}</div>
+      </div>
+      <div style="font-weight:800;color:#ef4444;font-size:13px;flex-shrink:0;">−${l.quantity}<span style="font-size:10px;font-weight:400;color:#a5b4fc;"> ${item?item.unit:''}</span></div>
+    </div>`;
   }).join('');
 }
 
