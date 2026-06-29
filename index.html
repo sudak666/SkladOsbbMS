@@ -186,6 +186,12 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   .main{padding-bottom:70px;}
   .stats-grid{grid-template-columns:1fr!important;}
   #statCats .pbar{height:5px;}
+  /* Add page improvements */
+  #page-add .card{padding:16px!important;}
+  #page-add h3{font-size:15px!important;margin-bottom:14px!important;}
+  .add-new-section{margin-top:20px!important;padding-top:18px!important;}
+  .barcode-scan-btn{width:100%;margin-bottom:4px;}
+  #newName{font-size:15px!important;}
 }
 
 /* ===BOTTOM NAV (mobile only)=== */
@@ -222,10 +228,14 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
 .pin-key:active{background:rgba(99,102,241,.4);transform:scale(.94);}
 
 /* ===QR MODAL=== */
-#qrModal .modal{width:360px;}
-#qrReader{width:100%;border-radius:12px;overflow:hidden;background:#000;}
-#qrReader video{width:100%!important;}
+#qrModal .modal,#barcodeAddModal .modal{width:360px;}
+#qrReader,#barcodeAddReader{width:100%;border-radius:12px;overflow:hidden;background:#000;}
+#qrReader video,#barcodeAddReader video{width:100%!important;}
 .qr-result{background:#f0f0ff;border-radius:10px;padding:12px;margin-top:12px;font-size:13px;color:#4338ca;font-weight:600;display:none;}
+.barcode-found{background:linear-gradient(135deg,#f0fff4,#dcfce7);border:1.5px solid #86efac;border-radius:12px;padding:14px;margin-top:12px;display:none;}
+.barcode-found .bf-name{font-size:14px;font-weight:700;color:#166534;margin-bottom:6px;}
+.barcode-found .bf-brand{font-size:12px;color:#15803d;}
+.barcode-not-found{background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:12px;margin-top:12px;font-size:13px;color:#c2410c;font-weight:600;display:none;}
 
 /* ===HISTORY MODAL=== */
 #histModal .modal{width:500px;max-height:80vh;overflow-y:auto;}
@@ -392,10 +402,17 @@ canvas#stockChart{width:100%!important;max-height:300px;}
           <div><label>Кількість</label><input type="number" class="inp" id="refillQtyI" min="0.1" step="0.1" placeholder="0"></div>
           <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="doRefill()">➕ Поповнити</button>
         </div>
-        <div style="margin-top:32px;padding-top:24px;border-top:1px solid #f0eeff;">
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid #f0eeff;" class="add-new-section">
           <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;">🆕 Новий товар</h3>
           <div style="display:flex;flex-direction:column;gap:14px;">
-            <div><label>Назва / артикул</label><input type="text" class="inp" id="newName" placeholder="Напр.: Лампа LED 10W E27"></div>
+            <div>
+              <label>Назва / артикул</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="text" class="inp" id="newName" placeholder="Напр.: Лампа LED 10W E27" style="flex:1;">
+                <button class="btn btn-ghost btn-sm barcode-scan-btn" onclick="openBarcodeAddScanner()" title="Сканувати штрих-код" style="padding:10px 12px;flex-shrink:0;white-space:nowrap;">📷 Скан</button>
+              </div>
+              <div id="barcodeAddStatus" style="display:none;margin-top:8px;"></div>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" class="two-col">
               <div><label>Категорія</label><select class="inp" id="newCat"><option value="Прибирання">🧹 Прибирання</option><option value="Ремонт">🔧 Ремонт</option><option value="Електрика">⚡ Електрика</option><option value="Сантехніка">🚿 Сантехніка</option><option value="Відеоспостереження">📹 Відеоспостереження</option><option value="Інше">📦 Інше</option></select></div>
               <div><label>Одиниця</label><input type="text" class="inp" id="newUnit" placeholder="штук, уп., м.п."></div>
@@ -483,6 +500,32 @@ canvas#stockChart{width:100%!important;max-height:300px;}
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="this.classList.remove('open')">
   <img id="lbImg" src="" alt="" style="max-width:90vw;max-height:90vh;border-radius:12px;">
+</div>
+
+<!-- BARCODE SCANNER MODAL (for adding new item) -->
+<div class="modal-bg" id="barcodeAddModal" onclick="closeModal('barcodeAddModal',event)">
+  <div class="modal">
+    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:14px;">📷 Сканер штрих-коду</h3>
+    <div id="barcodeAddReader"></div>
+    <div id="barcodeAddResult" style="margin-top:12px;">
+      <div id="barcodeAddScanning" style="text-align:center;font-size:13px;color:#a5b4fc;padding:8px 0;">Наведіть камеру на штрих-код товару</div>
+      <div class="barcode-found" id="barcodeFound">
+        <div class="bf-name" id="bfName"></div>
+        <div class="bf-brand" id="bfBrand"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="applyBarcodeResult()">✅ Використати</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetBarcodeScanner()">🔄 Ще раз</button>
+        </div>
+      </div>
+      <div class="barcode-not-found" id="barcodeNotFound">
+        ⚠️ Товар не знайдено в базі. Введіть назву вручну.
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center;" onclick="resetBarcodeScanner()">🔄 Спробувати ще</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="stopBarcodeAdd();closeModal('barcodeAddModal')">Закрити</button>
+    </div>
+  </div>
 </div>
 
 <!-- QR SCANNER MODAL -->
@@ -970,6 +1013,87 @@ function setPerson(name, btn) {
   btn.style.color = '#fff';
 }
 
+// ===== BARCODE SCANNER (ADD NEW ITEM) =====
+let barcodeAddScanner=null;
+let barcodeFoundData=null;
+
+function openBarcodeAddScanner(){
+  document.getElementById('barcodeAddModal').classList.add('open');
+  resetBarcodeScanner();
+  setTimeout(()=>{
+    barcodeAddScanner=new Html5Qrcode('barcodeAddReader');
+    barcodeAddScanner.start(
+      {facingMode:'environment'},
+      {fps:10,qrbox:{width:240,height:120}},
+      async(decoded)=>{
+        // pause scanning
+        try{if(barcodeAddScanner&&barcodeAddScanner.isScanning) await barcodeAddScanner.pause();}catch(e){}
+        document.getElementById('barcodeAddScanning').textContent='🔍 Шукаємо штрих-код '+decoded+'...';
+        await lookupBarcode(decoded);
+      },
+      ()=>{}
+    ).catch(()=>{
+      document.getElementById('barcodeAddScanning').textContent='⚠️ Не вдалось запустити камеру. Перевірте дозволи.';
+    });
+  },300);
+}
+
+async function lookupBarcode(code){
+  try{
+    const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,brands,categories_tags`);
+    const d=await r.json();
+    if(d.status===1&&d.product){
+      const p=d.product;
+      const name=p.product_name||'';
+      const brand=p.brands||'';
+      const fullName=(brand&&!name.toLowerCase().includes(brand.toLowerCase()))?brand+' '+name:name;
+      barcodeFoundData={name:fullName.trim()||code,brand};
+      document.getElementById('bfName').textContent='📦 '+barcodeFoundData.name;
+      document.getElementById('bfBrand').textContent=brand?'🏷️ '+brand:'';
+      document.getElementById('barcodeFound').style.display='block';
+      document.getElementById('barcodeNotFound').style.display='none';
+      document.getElementById('barcodeAddScanning').style.display='none';
+    } else {
+      barcodeFoundData=null;
+      document.getElementById('barcodeFound').style.display='none';
+      document.getElementById('barcodeNotFound').style.display='block';
+      document.getElementById('barcodeAddScanning').style.display='none';
+    }
+  }catch(e){
+    document.getElementById('barcodeNotFound').style.display='block';
+    document.getElementById('barcodeAddScanning').textContent='';
+  }
+}
+
+function applyBarcodeResult(){
+  if(!barcodeFoundData) return;
+  document.getElementById('newName').value=barcodeFoundData.name;
+  const st=document.getElementById('barcodeAddStatus');
+  st.style.display='block';
+  st.innerHTML=`<span style="font-size:12px;color:#15803d;font-weight:600;">✅ Знайдено через штрих-код${barcodeFoundData.brand?' · '+barcodeFoundData.brand:''}</span>`;
+  stopBarcodeAdd();
+  closeModal('barcodeAddModal');
+  toast('✅ Назву підставлено!','success');
+}
+
+function resetBarcodeScanner(){
+  barcodeFoundData=null;
+  document.getElementById('barcodeFound').style.display='none';
+  document.getElementById('barcodeNotFound').style.display='none';
+  document.getElementById('barcodeAddScanning').style.display='block';
+  document.getElementById('barcodeAddScanning').textContent='Наведіть камеру на штрих-код товару';
+  // resume if paused
+  try{if(barcodeAddScanner&&!barcodeAddScanner.isScanning) barcodeAddScanner.resume();}catch(e){}
+}
+
+function stopBarcodeAdd(){
+  if(barcodeAddScanner){
+    try{if(barcodeAddScanner.isScanning) barcodeAddScanner.stop().catch(()=>{});}catch(e){}
+    barcodeAddScanner=null;
+  }
+  const el=document.getElementById('barcodeAddReader');if(el) el.innerHTML='';
+}
+
 // ===== QR SCANNER =====
 let qrScanner=null;
 function openQR(){
@@ -1072,9 +1196,9 @@ function toast(msg,type=''){
 document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['qModal','photoModal','delModal','histModal','chartModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
+    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
     document.getElementById('lightbox').classList.remove('open');
-    stopQR();
+    stopQR();stopBarcodeAdd();
   }
 });
 
