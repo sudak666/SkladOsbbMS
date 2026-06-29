@@ -1237,7 +1237,23 @@ loadItems().then(()=>loadLogs());
 
 <script>
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    // Примусово перевіряємо оновлення при кожному завантаженні
+    reg.update();
+    // Якщо є новий SW — одразу активуємо без очікування
+    reg.addEventListener('updatefound',()=>{
+      const newSW=reg.installing;
+      newSW.addEventListener('statechange',()=>{
+        if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+          newSW.postMessage({type:'SKIP_WAITING'});
+        }
+      });
+    });
+  }).catch(()=>{});
+  // Перезавантажуємо сторінку коли новий SW стає активним
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    window.location.reload();
+  });
 }
 </script>
 </body>
