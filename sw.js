@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sklad-v5';
+const CACHE_NAME = 'sklad-v4';
 const STATIC = [
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
