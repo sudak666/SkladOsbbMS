@@ -2,6 +2,9 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23312e81'/><text y='.9em' font-size='80' x='10'>🏪</text></svg>">
     <link rel="shortcut icon" href="icon-192.png">
     <meta name="theme-color" content="#312e81">
@@ -131,6 +134,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
 .split{display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start;}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 .empty{text-align:center;padding:48px;color:#a5b4fc;}
+#logMobileList{display:none;}
 
 @media(max-width:960px){
   .split,.g4{grid-template-columns:1fr 1fr;}
@@ -193,6 +197,7 @@ label{display:block;font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5
   /* Log page - hide table, show cards */
   #page-log .card table{display:none;}
   #logMobileList{display:block;}
+  #logMobileList{}
   /* Add page */
   #page-add .card{padding:14px!important;}
   #page-add h3{font-size:15px!important;margin-bottom:14px!important;}
@@ -397,7 +402,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
         <thead><tr><th>Дата</th><th>Товар</th><th>К-сть</th><th>Кому</th><th>Примітка</th></tr></thead>
         <tbody id="logTable"><tr><td colspan="5" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
       </table>
-      <div id="logMobileList" style="display:none;"></div>
+      <div id="logMobileList"></div>
     </div>
   </div>
 
@@ -1236,18 +1241,12 @@ loadItems().then(()=>loadLogs());
 
 
 <script>
+// Вимикаємо SW повністю — він заважав оновленням
 if('serviceWorker' in navigator){
-  // Спочатку знімаємо ВСІ старі SW і чистимо ВСІ кеші
   navigator.serviceWorker.getRegistrations().then(regs=>{
     regs.forEach(r=>r.unregister());
   });
   caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
-  // Реєструємо новий SW з затримкою щоб старий встиг знятись
-  setTimeout(()=>{
-    navigator.serviceWorker.register('sw.js?v=4').then(reg=>{
-      reg.update();
-    }).catch(()=>{});
-  },500);
 }
 </script>
 </body>
