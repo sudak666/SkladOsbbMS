@@ -1237,23 +1237,17 @@ loadItems().then(()=>loadLogs());
 
 <script>
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(reg=>{
-    // Примусово перевіряємо оновлення при кожному завантаженні
-    reg.update();
-    // Якщо є новий SW — одразу активуємо без очікування
-    reg.addEventListener('updatefound',()=>{
-      const newSW=reg.installing;
-      newSW.addEventListener('statechange',()=>{
-        if(newSW.state==='installed'&&navigator.serviceWorker.controller){
-          newSW.postMessage({type:'SKIP_WAITING'});
-        }
-      });
-    });
-  }).catch(()=>{});
-  // Перезавантажуємо сторінку коли новий SW стає активним
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    window.location.reload();
+  // Спочатку знімаємо ВСІ старі SW і чистимо ВСІ кеші
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
   });
+  caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+  // Реєструємо новий SW з затримкою щоб старий встиг знятись
+  setTimeout(()=>{
+    navigator.serviceWorker.register('sw.js?v=4').then(reg=>{
+      reg.update();
+    }).catch(()=>{});
+  },500);
 }
 </script>
 </body>
