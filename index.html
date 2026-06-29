@@ -525,8 +525,9 @@ canvas#stockChart{width:100%!important;max-height:300px;}
       </div>
     </div>
     <div class="barcode-not-found" id="barcodeNotFound">
-      ⚠️ Товар не знайдено в базі. Введіть назву вручну.
-      <button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center;" onclick="resetBarcodeScanner()">🔄 Спробувати ще</button>
+      ⚠️ Товар не знайдено в базі.
+      <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center;" onclick="searchInGoogle()">🔍 Шукати в Google</button>
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px;width:100%;justify-content:center;" onclick="resetBarcodeScanner()">🔄 Сканувати ще раз</button>
     </div>
     <div style="margin-top:14px;">
       <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="stopBarcodeAdd();closeModal('barcodeAddModal')">Закрити</button>
@@ -1041,7 +1042,7 @@ function setPerson(name, btn) {
 }
 
 // ===== BARCODE SCANNER (НОВИЙ ТОВАР) =====
-let barcodeAddScanner=null,barcodeFoundData=null;
+let barcodeAddScanner=null,barcodeFoundData=null,lastScannedCode='';
 function openBarcodeAddScanner(){
   document.getElementById('barcodeAddModal').classList.add('open');
   resetBarcodeScanner();
@@ -1051,35 +1052,19 @@ function openBarcodeAddScanner(){
       {facingMode:'environment'},
       {fps:10,qrbox:{width:240,height:120}},
       async(decoded)=>{
+        lastScannedCode=decoded;
         try{if(barcodeAddScanner&&barcodeAddScanner.isScanning) await barcodeAddScanner.pause();}catch(e){}
-        document.getElementById('barcodeAddScanning').textContent='🔍 Шукаємо '+decoded+'...';
-        try{
-          const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+decoded+'.json?fields=product_name,brands');
-          const d=await r.json();
-          if(d.status===1&&d.product){
-            const name=(d.product.product_name||'').trim();
-            const brand=(d.product.brands||'').trim();
-            const full=brand&&!name.toLowerCase().includes(brand.toLowerCase())?brand+' '+name:name;
-            barcodeFoundData={name:full||decoded,brand};
-            document.getElementById('bfName').textContent='📦 '+(full||decoded);
-            document.getElementById('bfBrand').textContent=brand?'🏷️ '+brand:'';
-            document.getElementById('barcodeFound').style.display='block';
-            document.getElementById('barcodeNotFound').style.display='none';
-            document.getElementById('barcodeAddScanning').style.display='none';
-          } else {
-            barcodeFoundData=null;
-            document.getElementById('barcodeFound').style.display='none';
-            document.getElementById('barcodeNotFound').style.display='block';
-            document.getElementById('barcodeAddScanning').style.display='none';
-          }
-        }catch(e){
-          document.getElementById('barcodeNotFound').style.display='block';
-          document.getElementById('barcodeAddScanning').style.display='none';
-        }
+        stopBarcodeAdd();
+        closeModal('barcodeAddModal');
+        window.open('https://www.google.com/search?q='+encodeURIComponent(decoded),'_blank');
       },
       ()=>{}
     ).catch(()=>{document.getElementById('barcodeAddScanning').textContent='⚠️ Не вдалось запустити камеру.';});
   },300);
+}
+function searchInGoogle(){
+  if(!lastScannedCode) return;
+  window.open('https://www.google.com/search?q='+encodeURIComponent(lastScannedCode+' товар'), '_blank');
 }
 function applyBarcodeResult(){
   if(!barcodeFoundData) return;
