@@ -751,13 +751,18 @@ async function loadLogs(){
 let allReceipts=[];
 async function loadReceipts(){
   const tb=document.getElementById('recTable');
+  const mb=document.getElementById('recMobileList');
   if(tb) tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--ios-gray);">Завантаження...</td></tr>';
   const {data,error}=await db.from('inventory_receipts').select('*').order('received_at',{ascending:false}).limit(200);
   if(error){
-    if(tb) tb.innerHTML='<tr><td colspan="6"><div class="empty">⚠️ Таблиця приходів ще не створена.<br><small>Виконайте SQL-скрипт в Supabase.</small></div></td></tr>';
+    const msg='⚠️ '+error.message;
+    if(tb) tb.innerHTML=`<tr><td colspan="6"><div class="empty">${msg}</div></td></tr>`;
+    if(mb) mb.innerHTML=`<div class="empty" style="padding:32px 16px;text-align:center;color:#c2410c;font-size:13px;">${msg}<br><br><small style="color:var(--ios-gray)">Виконайте SQL-скрипт receipts_table.sql в Supabase SQL Editor</small></div>`;
+    toast('⚠️ Прихід: '+error.message,'error');
     return;
   }
-  allReceipts=data||[];renderReceipts();
+  allReceipts=data||[];
+  renderReceipts();
 }
 async function refreshAll(){await loadItems();await loadLogs();toast('Дані оновлено','success');}
 
