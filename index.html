@@ -440,7 +440,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
             <div><label>Назва / артикул</label><input type="text" class="inp" id="newName" placeholder="Напр.: Лампа LED 10W E27"><button class="btn btn-ghost" onclick="openBarcodeAddScanner()" style="width:100%;justify-content:center;margin-top:8px;padding:9px;font-size:13px;border-style:dashed;">📷 Сканувати штрих-код товару</button><div id="barcodeAddStatus" style="display:none;margin-top:6px;font-size:12px;color:#15803d;font-weight:600;"></div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" class="two-col">
               <div><label>Категорія</label><select class="inp" id="newCat"><option value="Прибирання">🧹 Прибирання</option><option value="Ремонт">🔧 Ремонт</option><option value="Електрика">⚡ Електрика</option><option value="Сантехніка">🚿 Сантехніка</option><option value="Відеоспостереження">📹 Відеоспостереження</option><option value="Інше">📦 Інше</option></select></div>
-              <div><label>Одиниця</label><input type="text" class="inp" id="newUnit" placeholder="штук, уп., м.п."></div>
+              <div><label>Одиниця</label><input type="text" class="inp" id="newUnit" placeholder="шт, уп., м.п." inputmode="text" onblur="if(/^\d+([.,]\d+)?$/.test(this.value.trim())) toast('⚠️ Одиниця має бути словом, не числом!','error');"></div>
             </div>
             <div><label>Початкова к-сть</label><input type="number" class="inp" id="newQty" min="0" step="0.1" placeholder="0"></div>
             <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doAddNew()">✅ Додати товар</button>
@@ -907,9 +907,10 @@ async function doRefill(){
 async function doAddNew(){
   const name=document.getElementById('newName').value.trim();
   const category=document.getElementById('newCat').value;
-  const unit=document.getElementById('newUnit').value.trim()||'штук';
+  const unit=document.getElementById('newUnit').value.trim()||'шт';
   const quantity=parseFloat(document.getElementById('newQty').value)||0;
   if(!name) return toast('Введіть назву товару!','error');
+  if(/^\d+([.,]\d+)?$/.test(unit)) return toast('⚠️ "Одиниця" має бути словом (напр. "шт", "уп."), а не числом!','error');
   const {error}=await db.from('inventory_items').insert([{name,category,unit,quantity}]);
   if(error) return toast('Помилка: '+error.message,'error');
   toast('✅ "'+name+'" додано!','success');
