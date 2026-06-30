@@ -331,6 +331,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     <div class="ni" data-page="issue" onclick="nav('issue',this)"><span class="ni-icon">➡️</span><span class="nav-label">Видача</span></div>
     <div class="ni" data-page="log" onclick="nav('log',this)"><span class="ni-icon">📋</span><span class="nav-label">Журнал</span></div>
     <div class="ni" data-page="add" onclick="nav('add',this)"><span class="ni-icon">➕</span><span class="nav-label">Додати</span></div>
+    <div class="ni" data-page="audit" onclick="nav('audit',this)"><span class="ni-icon">📋</span><span class="nav-label">Інвентаризація</span></div>
     <div class="ni" data-page="receipts" onclick="nav('receipts',this)"><span class="ni-icon">📥</span><span class="nav-label">Прихід</span></div>
     <div class="ni" data-page="stats" onclick="nav('stats',this)"><span class="ni-icon">📊</span><span class="nav-label">Статистика</span></div>
   </nav>
@@ -474,6 +475,38 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     </div>
   </div>
 
+  <!-- AUDIT -->
+  <div id="page-audit" class="page">
+    <!-- Заголовок і контроли -->
+    <div class="card" style="padding:16px 20px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:17px;font-weight:800;color:var(--ios-label);letter-spacing:-.3px;">📋 Інвентаризація складу</div>
+          <div id="auditDate" style="font-size:12px;color:var(--ios-gray);margin-top:2px;"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="auditFillZeros()" title="Обнулити всі поля">⬜ Очистити</button>
+          <button class="btn btn-ghost btn-sm" onclick="auditFillCurrent()" title="Підставити поточні залишки">📋 Підставити поточні</button>
+          <button class="btn btn-primary" onclick="openAuditConfirm()" style="font-weight:700;">✅ Завершити інвентаризацію</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <div class="sw" style="flex:1;min-width:160px;max-width:280px;"><span class="si">🔍</span><input class="inp" id="auditSearch" placeholder="Пошук товару..." oninput="renderAuditList()"></div>
+        <div id="auditStats" style="font-size:12px;color:var(--ios-gray);"></div>
+      </div>
+    </div>
+
+    <!-- Легенда -->
+    <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <span style="font-size:12px;display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#dcfce7;display:inline-block;border:1px solid #86efac;"></span>Надлишок</span>
+      <span style="font-size:12px;display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#fee2e2;display:inline-block;border:1px solid #fca5a5;"></span>Нестача</span>
+      <span style="font-size:12px;display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#f3f4f6;display:inline-block;border:1px solid #e5e7eb;"></span>Не перераховано</span>
+    </div>
+
+    <!-- Список товарів -->
+    <div id="auditList" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+
   <!-- RECEIPTS -->
   <div id="page-receipts" class="page">
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
@@ -541,6 +574,19 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     <div style="display:flex;gap:10px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('delModal')">Скасувати</button>
       <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDelete()">🗑️ Видалити</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT CONFIRM MODAL -->
+<div class="modal-bg" id="auditModal" onclick="closeModal('auditModal',event)">
+  <div class="modal" style="width:420px;">
+    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:6px;letter-spacing:-.3px;">✅ Завершити інвентаризацію</h3>
+    <div id="auditSummary" style="background:var(--ios-bg);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.7;"></div>
+    <div><label>Примітка до інвентаризації</label><input type="text" class="inp" id="auditNote" placeholder="Напр.: Планова інвентаризація червень 2026"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('auditModal')">Скасувати</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmAudit()">💾 Зберегти і оновити</button>
     </div>
   </div>
 </div>
@@ -697,7 +743,7 @@ let allItems=[],allLogs=[],curCat='',logCat='',quickId=null,photoItemId=null,del
 const catBadge={'Прибирання':'bc','Ремонт':'br','Електрика':'be','Сантехніка':'bp','Відеоспостереження':'bv','Інше':'bo'};
 const catIcon={'Прибирання':'🧹','Ремонт':'🔧','Електрика':'⚡','Сантехніка':'🚿','Відеоспостереження':'📹','Інше':'📦'};
 const catColor={'Прибирання':'#16a34a','Ремонт':'#ea580c','Електрика':'#ca8a04','Сантехніка':'#2563eb','Відеоспостереження':'#7c3aed','Інше':'#64748b'};
-const pageTitles={items:'📦 Товари на складі',issue:'➡️ Видача зі складу',log:'📋 Журнал видач',add:'➕ Додати / Поповнити',receipts:'📥 Прихід товару',stats:'📊 Статистика'};
+const pageTitles={items:'📦 Товари на складі',issue:'➡️ Видача зі складу',log:'📋 Журнал видач',add:'➕ Додати / Поповнити',receipts:'📥 Прихід товару',audit:'📋 Інвентаризація',stats:'📊 Статистика'};
 
 // ===== PIN AUTH =====
 const PIN='1234';
@@ -734,9 +780,200 @@ function nav(page,el){
   if(page==='log'){loadLogs();}
   if(page==='add'){populateSels();renderAddLow();}
   if(page==='receipts'){loadReceipts();}
+  if(page==='audit'){initAudit();}
   if(page==='stats'){renderStats();}
 }
 function goReceipts(){nav('receipts',null);}
+
+// ===== ІНВЕНТАРИЗАЦІЯ =====
+let auditData={}; // {itemId: actualQty або null}
+
+function initAudit(){
+  auditData={};
+  // ініціалізуємо всі товари як "не перераховано" (null)
+  allItems.forEach(i=>{ auditData[i.id]=null; });
+  document.getElementById('auditDate').textContent='Розпочато: '+new Date().toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('auditSearch').value='';
+  renderAuditList();
+}
+
+function renderAuditList(){
+  const s=document.getElementById('auditSearch').value.toLowerCase();
+  let items=allItems;
+  if(s) items=items.filter(i=>i.name.toLowerCase().includes(s)||(i.category||'').toLowerCase().includes(s));
+
+  let counted=0,surplus=0,shortage=0;
+  Object.values(auditData).forEach(v=>{if(v!==null) counted++;});
+  allItems.forEach(i=>{
+    const v=auditData[i.id];
+    if(v===null) return;
+    const diff=v-i.quantity;
+    if(diff>0) surplus++;
+    else if(diff<0) shortage++;
+  });
+  document.getElementById('auditStats').textContent=
+    `Перераховано: ${counted}/${allItems.length} · ▲ Надлишок: ${surplus} · ▼ Нестача: ${shortage}`;
+
+  const list=document.getElementById('auditList');
+  if(!items.length){list.innerHTML='<div class="empty">📭 Нічого не знайдено</div>';return;}
+
+  list.innerHTML=items.map(item=>{
+    const actual=auditData[item.id];
+    const isCounted=actual!==null;
+    const diff=isCounted ? actual-item.quantity : null;
+    let bg='#f9fafb', border='#e5e7eb', diffHtml='';
+    if(isCounted){
+      if(diff>0){bg='#f0fdf4';border='#86efac';diffHtml=`<span style="color:var(--ios-green);font-weight:700;font-size:12px;">▲ +${diff}</span>`;}
+      else if(diff<0){bg='#fef2f2';border='#fca5a5';diffHtml=`<span style="color:var(--ios-red);font-weight:700;font-size:12px;">▼ ${diff}</span>`;}
+      else{bg='#f0fdf4';border='#86efac';diffHtml=`<span style="color:var(--ios-green);font-size:12px;">✓ Збігається</span>`;}
+    }
+    const cat=item.category||'';
+    const icon=catIcon[cat]||'📦';
+    return `<div style="background:${bg};border:1.5px solid ${border};border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:all .2s;">
+      <div style="font-size:22px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;color:var(--ios-label);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
+        <div style="font-size:11px;color:var(--ios-gray);margin-top:2px;">
+          <span class="badge ${catBadge[cat]||'bo'}" style="font-size:10px;">${cat}</span>
+          · За даними: <b>${item.quantity} ${item.unit}</b>
+          ${diffHtml?'· '+diffHtml:''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number"
+            id="audit_${item.id}"
+            value="${isCounted?actual:''}"
+            placeholder="?"
+            min="0" step="any"
+            style="width:80px;padding:7px 10px;border-radius:10px;border:1.5px solid ${isCounted?border:'#d1d5db'};font-size:15px;font-weight:700;text-align:center;background:#fff;outline:none;-webkit-appearance:none;"
+            oninput="onAuditInput(${item.id},this.value)"
+            onfocus="this.select()">
+          <span style="font-size:11px;color:var(--ios-gray);">${item.unit}</span>
+        </div>
+        ${isCounted?`<button onclick="clearAuditItem(${item.id})" style="font-size:10px;color:var(--ios-gray);background:none;border:none;cursor:pointer;padding:0;">✕ скинути</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function onAuditInput(itemId, val){
+  const num=parseFloat(val);
+  auditData[itemId]=(val===''||isNaN(num))?null:num;
+  // перерендеримо тільки stats без повного перерендеру (щоб не загубити фокус)
+  const item=allItems.find(i=>i.id===itemId);
+  if(!item) return;
+  const actual=auditData[itemId];
+  const isCounted=actual!==null;
+  const diff=isCounted?actual-item.quantity:null;
+  const el=document.getElementById('audit_'+itemId);
+  if(!el) return;
+  const row=el.closest('div[style*="border-radius:14px"]');
+  if(!row) return;
+  if(!isCounted){row.style.background='#f9fafb';row.style.borderColor='#e5e7eb';}
+  else if(diff>0){row.style.background='#f0fdf4';row.style.borderColor='#86efac';}
+  else if(diff<0){row.style.background='#fef2f2';row.style.borderColor='#fca5a5';}
+  else{row.style.background='#f0fdf4';row.style.borderColor='#86efac';}
+  // оновлюємо лічильник
+  let counted=0,surplus=0,shortage=0;
+  allItems.forEach(i=>{
+    const v=auditData[i.id];
+    if(v===null) return;
+    counted++;
+    const d=v-i.quantity;
+    if(d>0) surplus++;
+    else if(d<0) shortage++;
+  });
+  document.getElementById('auditStats').textContent=
+    `Перераховано: ${counted}/${allItems.length} · ▲ Надлишок: ${surplus} · ▼ Нестача: ${shortage}`;
+}
+
+function clearAuditItem(itemId){
+  auditData[itemId]=null;
+  renderAuditList();
+}
+
+function auditFillCurrent(){
+  allItems.forEach(i=>{ auditData[i.id]=i.quantity; });
+  renderAuditList();
+  toast('📋 Підставлено поточні залишки','success');
+}
+
+function auditFillZeros(){
+  allItems.forEach(i=>{ auditData[i.id]=null; });
+  renderAuditList();
+}
+
+function openAuditConfirm(){
+  const counted=allItems.filter(i=>auditData[i.id]!==null);
+  const diffs=counted.filter(i=>{const d=auditData[i.id]-i.quantity;return d!==0;});
+  const surplus=diffs.filter(i=>auditData[i.id]-i.quantity>0);
+  const shortage=diffs.filter(i=>auditData[i.id]-i.quantity<0);
+  const uncounted=allItems.filter(i=>auditData[i.id]===null);
+
+  document.getElementById('auditSummary').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:800;color:var(--ios-blue);">${counted.length}</div>
+        <div style="font-size:11px;color:var(--ios-gray);">Перераховано</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:800;color:#f59e0b;">${uncounted.length}</div>
+        <div style="font-size:11px;color:var(--ios-gray);">Не перераховано</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:800;color:var(--ios-green);">▲ ${surplus.length}</div>
+        <div style="font-size:11px;color:var(--ios-gray);">Надлишок</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:800;color:var(--ios-red);">▼ ${shortage.length}</div>
+        <div style="font-size:11px;color:var(--ios-gray);">Нестача</div>
+      </div>
+    </div>
+    ${uncounted.length>0?`<div style="margin-top:10px;font-size:12px;color:#f59e0b;">⚠️ ${uncounted.length} товарів не будуть оновлені (поле порожнє)</div>`:''}
+  `;
+  document.getElementById('auditModal').classList.add('open');
+}
+
+async function confirmAudit(){
+  const note=document.getElementById('auditNote').value.trim();
+  const counted=allItems.filter(i=>auditData[i.id]!==null);
+  const diffs=counted.filter(i=>auditData[i.id]!==i.quantity);
+
+  // 1. Зберігаємо заголовок інвентаризації
+  const {data:auditRow,error:auditErr}=await db.from('inventory_audits').insert([{
+    note:note||null,
+    total_items:counted.length,
+    items_with_diff:diffs.length
+  }]).select().single();
+  if(auditErr) return toast('Помилка збереження: '+auditErr.message,'error');
+
+  // 2. Зберігаємо рядки
+  const auditItems=counted.map(item=>({
+    audit_id:auditRow.id,
+    item_id:item.id,
+    item_name:item.name,
+    category:item.category||'',
+    unit:item.unit||'',
+    qty_before:item.quantity,
+    qty_actual:auditData[item.id]
+  }));
+  const {error:rowsErr}=await db.from('inventory_audit_items').insert(auditItems);
+  if(rowsErr) return toast('Помилка збереження рядків: '+rowsErr.message,'error');
+
+  // 3. Оновлюємо залишки тільки тих де є розбіжність
+  let updateErrors=0;
+  for(const item of diffs){
+    const {error}=await db.from('inventory_items').update({quantity:auditData[item.id]}).eq('id',item.id);
+    if(error) updateErrors++;
+  }
+
+  closeModal('auditModal');
+  await loadItems();
+  toast(`✅ Інвентаризацію завершено! Оновлено ${diffs.length} позицій${updateErrors?', помилок: '+updateErrors:''}`, 'success');
+  // Скидаємо стан
+  initAudit();
+}
 
 // ===== LOAD =====
 async function loadItems(){
@@ -1538,49 +1775,4 @@ function toast(msg,type=''){
 document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal','delLogModal','editLogModal','delReceiptModal','editReceiptModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
-    document.getElementById('lightbox').classList.remove('open');
-    stopQR();stopBarcodeAdd();
-  }
-});
-
-loadItems().then(()=>loadLogs());
-</script>
-
-<!-- BOTTOM NAV (mobile) -->
-<div class="bottom-nav" id="bottomNav">
-  <div class="bn-item active" data-page="items" onclick="nav('items',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📦</span></div>
-    <span class="bn-label">Товари</span>
-    <span class="bn-badge" id="bn-alert" style="display:none">!</span>
-  </div>
-  <div class="bn-item" data-page="issue" onclick="nav('issue',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📤</span></div>
-    <span class="bn-label">Видача</span>
-  </div>
-  <div class="bn-item" data-page="log" onclick="nav('log',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">🗒️</span></div>
-    <span class="bn-label">Журнал</span>
-  </div>
-  <div class="bn-item" data-page="add" onclick="nav('add',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">➕</span></div>
-    <span class="bn-label">Додати</span>
-  </div>
-  <div class="bn-item" data-page="stats" onclick="nav('stats',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📊</span></div>
-    <span class="bn-label">Звіт</span>
-  </div>
-</div>
-
-
-<script>
-// Вимикаємо SW повністю — він заважав оновленням
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(r=>r.unregister());
-  });
-  caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
-}
-</script>
-</body>
-</html>
+    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal','delLogModal','editLogModal','delReceiptModal','
