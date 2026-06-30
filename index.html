@@ -1212,9 +1212,13 @@ async function doRefill(){
   // записуємо прихід в окрему таблицю (не блокуємо основний потік якщо таблиці ще немає)
   try{
     const {error:recErr}=await db.from('inventory_receipts').insert([{item_id:id,item_name:item.name,quantity:qty,supplier:supplier||null,note:note||null}]);
-    if(recErr) console.warn('inventory_receipts insert failed:',recErr.message);
+    if(recErr){
+      console.warn('inventory_receipts insert failed:',recErr.message);
+      toast('⚠️ Залишок оновлено, але прихід не збережено: '+recErr.message,'error');
+    }
   }catch(e){
     console.warn('inventory_receipts insert exception:',e);
+    toast('⚠️ Залишок оновлено, але прихід не збережено','error');
   }
   toast('✅ Поповнено +'+qty+' '+item.unit,'success');
   document.getElementById('refillQtyI').value='';
