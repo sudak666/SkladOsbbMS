@@ -416,8 +416,8 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     </div>
     <div class="card" style="overflow:hidden;">
       <table>
-        <thead><tr><th>Дата</th><th>Товар</th><th>К-сть</th><th>Кому</th><th>Примітка</th></tr></thead>
-        <tbody id="logTable"><tr><td colspan="5" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
+        <thead><tr><th>Дата</th><th>Товар</th><th>К-сть</th><th>Кому</th><th>Примітка</th><th>Дії</th></tr></thead>
+        <tbody id="logTable"><tr><td colspan="6" style="text-align:center;padding:40px;color:#a5b4fc;">Завантаження...</td></tr></tbody>
       </table>
       <div id="logMobileList"></div>
     </div>
@@ -518,6 +518,46 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     <div style="display:flex;gap:10px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('delModal')">Скасувати</button>
       <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDelete()">🗑️ Видалити</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE LOG MODAL -->
+<div class="modal-bg" id="delLogModal" onclick="closeModal('delLogModal',event)">
+  <div class="modal" style="width:380px;">
+    <h3 style="color:#ef4444;margin-bottom:8px;">🗑️ Видалити запис видачі?</h3>
+    <p id="delLogItemName" style="font-size:14px;color:#4b5563;margin-bottom:10px;line-height:1.5;"></p>
+    <p style="font-size:12px;color:#9ca3af;margin-bottom:20px;">Товар буде повернуто на склад (кількість збільшиться). Цю дію неможливо скасувати.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('delLogModal')">Скасувати</button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDeleteLog()">🗑️ Видалити</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT LOG MODAL -->
+<div class="modal-bg" id="editLogModal" onclick="closeModal('editLogModal',event)">
+  <div class="modal" style="width:400px;">
+    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:4px;letter-spacing:-.3px;">✏️ Редагувати видачу</h3>
+    <p id="editLogItemName" style="font-size:13px;color:var(--ios-gray);margin-bottom:18px;"></p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label>Кількість</label>
+        <input type="number" class="inp" id="editLogQty" step="any">
+      </div>
+      <div>
+        <label>Кому видано</label>
+        <input type="text" class="inp" id="editLogPerson">
+      </div>
+      <div>
+        <label>Примітка</label>
+        <input type="text" class="inp" id="editLogNote">
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--ios-gray);margin-top:12px;">При зміні кількості залишок товару на складі буде скориговано автоматично.</p>
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('editLogModal')">Скасувати</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmEditLog()">✅ Зберегти</button>
     </div>
   </div>
 </div>
@@ -845,7 +885,7 @@ function renderLog(){
   const tb=document.getElementById('logTable');
   const mb=document.getElementById('logMobileList');
   if(!logs.length){
-    tb.innerHTML='<tr><td colspan="5"><div class="empty">📭 Нічого не знайдено</div></td></tr>';
+    tb.innerHTML='<tr><td colspan="6"><div class="empty">📭 Нічого не знайдено</div></td></tr>';
     mb.innerHTML='<div class="empty">📭 Нічого не знайдено</div>';
     return;
   }
@@ -860,6 +900,10 @@ function renderLog(){
       <td style="font-weight:800;color:#6366f1;">${l.quantity} <span style="font-weight:400;color:#a5b4fc;font-size:11px;">${item?item.unit:''}</span></td>
       <td style="color:#4b5563;">${l.issued_to||'—'}</td>
       <td style="color:#9ca3af;font-size:12px;">${l.note||'—'}</td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn btn-ghost btn-sm" onclick="openEditLog(${l.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteLog(${l.id})">🗑️</button>
+      </div></td>
     </tr>`;
   }).join('');
   // mobile cards
@@ -875,9 +919,74 @@ function renderLog(){
         <div style="font-weight:600;color:#1e1b4b;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.item_name}</div>
         <div style="font-size:11px;color:#a5b4fc;margin-top:1px;">${l.issued_to||'—'} · ${dt}${l.note?' · '+l.note:''}</div>
       </div>
-      <div style="font-weight:800;color:#ef4444;font-size:13px;flex-shrink:0;">−${l.quantity}<span style="font-size:10px;font-weight:400;color:#a5b4fc;"> ${item?item.unit:''}</span></div>
+      <div style="font-weight:800;color:#ef4444;font-size:13px;flex-shrink:0;text-align:right;">
+        −${l.quantity}<span style="font-size:10px;font-weight:400;color:#a5b4fc;"> ${item?item.unit:''}</span>
+        <div style="display:flex;gap:4px;margin-top:4px;">
+          <button onclick="openEditLog(${l.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;">✏️</button>
+          <button onclick="openDeleteLog(${l.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;">🗑️</button>
+        </div>
+      </div>
     </div>`;
   }).join('');
+}
+
+// ===== EDIT / DELETE LOG =====
+let deleteLogId=null,editLogId=null;
+function openDeleteLog(id){
+  const l=allLogs.find(x=>x.id===id);
+  if(!l) return;
+  deleteLogId=id;
+  document.getElementById('delLogItemName').textContent=`${l.item_name} · ${l.quantity} ${(allItems.find(i=>i.id===l.item_id)||{}).unit||''} · ${l.issued_to||'—'}`;
+  document.getElementById('delLogModal').classList.add('open');
+}
+async function confirmDeleteLog(){
+  if(!deleteLogId) return;
+  const l=allLogs.find(x=>x.id===deleteLogId);
+  if(!l) return closeModal('delLogModal');
+  const item=allItems.find(i=>i.id===l.item_id);
+  if(item){
+    const newQ=Math.round((item.quantity+l.quantity)*100)/100;
+    await db.from('inventory_items').update({quantity:newQ}).eq('id',item.id);
+  }
+  const {error}=await db.from('inventory_logs').delete().eq('id',deleteLogId);
+  if(error) return toast('Помилка: '+error.message,'error');
+  toast('🗑️ Запис видалено, товар повернуто на склад','success');
+  closeModal('delLogModal');
+  deleteLogId=null;
+  await loadItems();await loadLogs();
+}
+function openEditLog(id){
+  const l=allLogs.find(x=>x.id===id);
+  if(!l) return;
+  editLogId=id;
+  const item=allItems.find(i=>i.id===l.item_id);
+  document.getElementById('editLogItemName').textContent=`${l.item_name}${item?' · поточний залишок: '+item.quantity+' '+item.unit:''}`;
+  document.getElementById('editLogQty').value=l.quantity;
+  document.getElementById('editLogPerson').value=l.issued_to||'';
+  document.getElementById('editLogNote').value=l.note||'';
+  document.getElementById('editLogModal').classList.add('open');
+}
+async function confirmEditLog(){
+  if(!editLogId) return;
+  const l=allLogs.find(x=>x.id===editLogId);
+  if(!l) return closeModal('editLogModal');
+  const newQty=parseFloat(document.getElementById('editLogQty').value);
+  const person=document.getElementById('editLogPerson').value.trim();
+  const note=document.getElementById('editLogNote').value.trim();
+  if(isNaN(newQty)||newQty<0) return toast('⚠️ Введіть коректну кількість','error');
+  const item=allItems.find(i=>i.id===l.item_id);
+  if(item){
+    const diff=l.quantity-newQty;
+    const adjustedStock=Math.round((item.quantity+diff)*100)/100;
+    if(adjustedStock<0) return toast('⚠️ Недостатньо товару на складі для такої кількості','error');
+    await db.from('inventory_items').update({quantity:adjustedStock}).eq('id',item.id);
+  }
+  const {error}=await db.from('inventory_logs').update({quantity:newQty,issued_to:person||null,note:note||null}).eq('id',editLogId);
+  if(error) return toast('Помилка: '+error.message,'error');
+  toast('✅ Запис оновлено','success');
+  closeModal('editLogModal');
+  editLogId=null;
+  await loadItems();await loadLogs();
 }
 
 // ===== ADD PAGE =====
@@ -976,7 +1085,14 @@ async function uploadPhoto(){
     canvas.toBlob(async(blob)=>{
       const path='items/'+photoItemId+'_'+Date.now()+'.jpg';
       const {error:upErr}=await db.storage.from('photos').upload(path,blob,{contentType:'image/jpeg',upsert:true});
-      if(upErr){status.textContent='Помилка: '+upErr.message;return;}
+      if(upErr){
+        if(/bucket/i.test(upErr.message)){
+          status.innerHTML='❌ Сховище фото не налаштовано.<br><small>Потрібно створити Storage bucket "photos" (Public) в Supabase Dashboard.</small>';
+        } else {
+          status.textContent='Помилка: '+upErr.message;
+        }
+        return;
+      }
       const {data:{publicUrl}}=db.storage.from('photos').getPublicUrl(path);
       const {error:dbErr}=await db.from('inventory_items').update({photo_url:publicUrl}).eq('id',photoItemId);
       if(dbErr){status.textContent='Помилка: '+dbErr.message;return;}
@@ -1202,7 +1318,7 @@ function toast(msg,type=''){
 document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
+    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal','delLogModal','editLogModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
     document.getElementById('lightbox').classList.remove('open');
     stopQR();stopBarcodeAdd();
   }
