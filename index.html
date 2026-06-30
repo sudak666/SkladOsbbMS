@@ -1209,8 +1209,13 @@ async function doRefill(){
   const nq=Math.round((item.quantity+qty)*100)/100;
   const {error}=await db.from('inventory_items').update({quantity:nq}).eq('id',id);
   if(error) return toast('Помилка: '+error.message,'error');
-  // записуємо прихід в окрему таблицю
-  await db.from('inventory_receipts').insert([{item_id:id,item_name:item.name,quantity:qty,supplier:supplier||null,note:note||null}]).catch(()=>{});
+  // записуємо прихід в окрему таблицю (не блокуємо основний потік якщо таблиці ще немає)
+  try{
+    const {error:recErr}=await db.from('inventory_receipts').insert([{item_id:id,item_name:item.name,quantity:qty,supplier:supplier||null,note:note||null}]);
+    if(recErr) console.warn('inventory_receipts insert failed:',recErr.message);
+  }catch(e){
+    console.warn('inventory_receipts insert exception:',e);
+  }
   toast('✅ Поповнено +'+qty+' '+item.unit,'success');
   document.getElementById('refillQtyI').value='';
   document.getElementById('refillSupplierI').value='';
