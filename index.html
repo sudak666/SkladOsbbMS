@@ -260,6 +260,7 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 .auth-dots{display:flex;gap:12px;justify-content:center;margin-bottom:28px;}
 .auth-dot{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .2s;}
 .auth-dot.filled{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
 .pin-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:4px;}
 .pin-key{background:rgba(255,255,255,.15);border:none;border-radius:50%;aspect-ratio:1;font-size:24px;font-weight:400;color:#fff;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;padding:0;width:100%;letter-spacing:-.5px;font-family:inherit;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
 .pin-key:active,.pin-key:focus{background:rgba(255,255,255,.35);transform:scale(.92);outline:none;}
@@ -746,7 +747,7 @@ const catColor={'Прибирання':'#16a34a','Ремонт':'#ea580c','Ел�
 const pageTitles={items:'📦 Товари на складі',issue:'➡️ Видача зі складу',log:'📋 Журнал видач',add:'➕ Додати / Поповнити',receipts:'📥 Прихід товару',audit:'📋 Інвентаризація',stats:'📊 Статистика'};
 
 // ===== PIN AUTH =====
-const PIN='1234';
+const PIN='3535';
 let pinEntered='';
 function pinPress(k){
   if(k==='C'){pinEntered='';}
@@ -762,8 +763,15 @@ function pinPress(k){
       sessionStorage.setItem('auth','ok');
     } else {
       document.getElementById('authErr').textContent='❌ Невірний PIN-код';
+      // тряска блоку
+      const box=document.querySelector('.auth-box');
+      box.style.animation='shake .4s';
+      setTimeout(()=>box.style.animation='',400);
       pinEntered='';
-      for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
+      setTimeout(()=>{
+        for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
+        document.getElementById('authErr').textContent='';
+      },400);
     }
   }
 }
@@ -1759,17 +1767,4 @@ function populateSels(){
 
 // ===== MODAL =====
 function closeModal(id,e){
-  if(e&&e.target!==document.getElementById(id)) return;
-  document.getElementById(id).classList.remove('open');
-}
-
-// ===== TOAST =====
-let toastT;
-function toast(msg,type=''){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className='show '+(type||'info');
-  clearTimeout(toastT);toastT=setTimeout(()=>el.className='',3200);
-}
-
-// ===== INIT =====
-document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10
+  if(e&&e.tar
