@@ -261,8 +261,8 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 .auth-dot{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .2s;}
 .auth-dot.filled{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5);}
 .pin-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:4px;}
-.pin-key{background:rgba(255,255,255,.15);border:none;border-radius:50%;aspect-ratio:1;font-size:24px;font-weight:400;color:#fff;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;padding:0;width:100%;letter-spacing:-.5px;}
-.pin-key:active{background:rgba(255,255,255,.35);transform:scale(.92);}
+.pin-key{background:rgba(255,255,255,.15);border:none;border-radius:50%;aspect-ratio:1;font-size:24px;font-weight:400;color:#fff;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;padding:0;width:100%;letter-spacing:-.5px;font-family:inherit;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.pin-key:active,.pin-key:focus{background:rgba(255,255,255,.35);transform:scale(.92);outline:none;}
 
 /* ===QR / BARCODE MODALS=== */
 #qrModal .modal,#barcodeAddModal .modal{width:360px;}
@@ -300,18 +300,18 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     </div>
     <div class="auth-err" id="authErr"></div>
     <div class="pin-keys">
-      <div class="pin-key" onclick="pinPress('1')">1</div>
-      <div class="pin-key" onclick="pinPress('2')">2</div>
-      <div class="pin-key" onclick="pinPress('3')">3</div>
-      <div class="pin-key" onclick="pinPress('4')">4</div>
-      <div class="pin-key" onclick="pinPress('5')">5</div>
-      <div class="pin-key" onclick="pinPress('6')">6</div>
-      <div class="pin-key" onclick="pinPress('7')">7</div>
-      <div class="pin-key" onclick="pinPress('8')">8</div>
-      <div class="pin-key" onclick="pinPress('9')">9</div>
-      <div class="pin-key" style="font-size:14px;" onclick="pinPress('C')">✕</div>
-      <div class="pin-key" onclick="pinPress('0')">0</div>
-      <div class="pin-key" style="font-size:14px;" onclick="pinPress('DEL')">⌫</div>
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" style="font-size:14px;" onclick="pinPress('C')">✕</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" style="font-size:14px;" onclick="pinPress('DEL')">⌫</button>
     </div>
   </div>
 </div>
@@ -1772,7 +1772,4 @@ function toast(msg,type=''){
 }
 
 // ===== INIT =====
-document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10);
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal','delLogModal','editLogModal','delReceiptModal','
+document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10
