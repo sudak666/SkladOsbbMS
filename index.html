@@ -342,7 +342,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
     <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;">📦 Товари на складі</h2>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
-      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік">📊</button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер">📷</button><button class="btn btn-ghost btn-sm" onclick="nav('receipts',document.querySelector('.ni[data-page="receipts"]'))" style="padding:6px 10px;" title="Прихід товару">📥</button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
+      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік">📊</button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер">📷</button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару">📥</button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
       <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="white-space:nowrap;">🔄 Оновити</button>
     </div>
   </div>
@@ -736,6 +736,7 @@ function nav(page,el){
   if(page==='receipts'){loadReceipts();}
   if(page==='stats'){renderStats();}
 }
+function goReceipts(){nav('receipts',null);}
 
 // ===== LOAD =====
 async function loadItems(){
