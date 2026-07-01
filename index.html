@@ -323,9 +323,10 @@ function pinPress(k){
   if(pinEntered.length===4){
     if(pinEntered===PIN){
       const scr=document.getElementById('authScreen');
-      scr.style.transition='opacity .4s';scr.style.opacity='0';
-      setTimeout(()=>scr.style.display='none',400);
+      scr.style.transition='opacity .3s';
+      scr.style.opacity='0';
       sessionStorage.setItem('auth','ok');
+      setTimeout(()=>{scr.style.display='none';scr.style.opacity='';},320);
     } else {
       document.getElementById('authErr').textContent='❌ Невірний PIN-код';
       const box=document.querySelector('.auth-box');
@@ -363,7 +364,7 @@ function pinPress(k){
 
 <div class="main">
   <div class="topbar">
-    <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;">📦 Товари на складі</h2>
+    <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;font-size:15px;">📦 Товари на складі</h2>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
       <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік">📊</button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер">📷</button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару">📥</button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
