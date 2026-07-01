@@ -6,7 +6,9 @@
 -- verify_pin(attempt), яка повертає true/false. Таблиця з хешем PIN
 -- закрита від прямого читання/запису анонімним ключем (RLS без політик).
 
-create extension if not exists pgcrypto;
+-- У Supabase розширення за замовчуванням встановлюється в схему "extensions",
+-- тому явно вказуємо її, а функції нижче додають цю схему в свій search_path.
+create extension if not exists pgcrypto with schema extensions;
 
 create table if not exists app_auth (
   id int primary key default 1,
@@ -20,14 +22,14 @@ alter table app_auth enable row level security;
 
 -- Задати (або змінити) PIN-код. Замініть '3535' на свій PIN.
 insert into app_auth (id, pin_hash)
-values (1, crypt('3535', gen_salt('bf')))
+values (1, extensions.crypt('3535', extensions.gen_salt('bf')))
 on conflict (id) do update set pin_hash = excluded.pin_hash;
 
 create or replace function verify_pin(attempt text)
 returns boolean
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select exists (
     select 1 from app_auth
