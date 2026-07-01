@@ -317,7 +317,36 @@ canvas#stockChart{width:100%!important;max-height:300px;}
   </div>
 </div>
 
-<div class="sidebar">
+<script>
+// PIN визначений тут щоб бути доступним одразу при натисканні кнопок
+const PIN='3535';
+let pinEntered='';
+function pinPress(k){
+  if(k==='C'){pinEntered='';}
+  else if(k==='DEL'){pinEntered=pinEntered.slice(0,-1);}
+  else if(pinEntered.length<4){pinEntered+=k;}
+  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinEntered.length);
+  document.getElementById('authErr').textContent='';
+  if(pinEntered.length===4){
+    if(pinEntered===PIN){
+      const scr=document.getElementById('authScreen');
+      scr.style.transition='opacity .4s';scr.style.opacity='0';
+      setTimeout(()=>scr.style.display='none',400);
+      sessionStorage.setItem('auth','ok');
+    } else {
+      document.getElementById('authErr').textContent='❌ Невірний PIN-код';
+      const box=document.querySelector('.auth-box');
+      box.style.animation='shake .4s';
+      setTimeout(()=>box.style.animation='',400);
+      pinEntered='';
+      setTimeout(()=>{
+        for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
+        document.getElementById('authErr').textContent='';
+      },400);
+    }
+  }
+}
+</script>
   <div class="sb-logo">
     <div style="font-size:32px;margin-bottom:6px;">🏪</div>
     <h1>Склад ОСББ</h1>
@@ -746,35 +775,7 @@ const catIcon={'Прибирання':'🧹','Ремонт':'🔧','Електр
 const catColor={'Прибирання':'#16a34a','Ремонт':'#ea580c','Електрика':'#ca8a04','Сантехніка':'#2563eb','Відеоспостереження':'#7c3aed','Інше':'#64748b'};
 const pageTitles={items:'📦 Товари на складі',issue:'➡️ Видача зі складу',log:'📋 Журнал видач',add:'➕ Додати / Поповнити',receipts:'📥 Прихід товару',audit:'📋 Інвентаризація',stats:'📊 Статистика'};
 
-// ===== PIN AUTH =====
-const PIN='3535';
-let pinEntered='';
-function pinPress(k){
-  if(k==='C'){pinEntered='';}
-  else if(k==='DEL'){pinEntered=pinEntered.slice(0,-1);}
-  else if(pinEntered.length<4){pinEntered+=k;}
-  for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinEntered.length);
-  document.getElementById('authErr').textContent='';
-  if(pinEntered.length===4){
-    if(pinEntered===PIN){
-      const scr=document.getElementById('authScreen');
-      scr.style.transition='opacity .4s';scr.style.opacity='0';
-      setTimeout(()=>scr.style.display='none',400);
-      sessionStorage.setItem('auth','ok');
-    } else {
-      document.getElementById('authErr').textContent='❌ Невірний PIN-код';
-      // тряска блоку
-      const box=document.querySelector('.auth-box');
-      box.style.animation='shake .4s';
-      setTimeout(()=>box.style.animation='',400);
-      pinEntered='';
-      setTimeout(()=>{
-        for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('filled');
-        document.getElementById('authErr').textContent='';
-      },400);
-    }
-  }
-}
+// ===== PIN AUTH (визначено вище перед HTML) =====
 if(sessionStorage.getItem('auth')==='ok') document.getElementById('authScreen').style.display='none';
 
 // ===== NAV =====
@@ -1767,4 +1768,65 @@ function populateSels(){
 
 // ===== MODAL =====
 function closeModal(id,e){
-  if(e&&e.tar
+  if(e&&e.target!==document.getElementById(id)) return;
+  document.getElementById(id).classList.remove('open');
+}
+
+// ===== TOAST =====
+let toastT;
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='show '+(type||'info');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.className='',3200);
+}
+
+// ===== INIT =====
+document.getElementById('issueDateI').value=new Date().toISOString().slice(0,10);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    ['qModal','photoModal','delModal','histModal','chartModal','barcodeAddModal','delLogModal','editLogModal','delReceiptModal','editReceiptModal','auditModal'].forEach(id=>document.getElementById(id).classList.remove('open'));
+    document.getElementById('lightbox').classList.remove('open');
+    stopQR();stopBarcodeAdd();
+  }
+});
+
+loadItems().then(()=>loadLogs());
+</script>
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bottom-nav" id="bottomNav">
+  <div class="bn-item active" data-page="items" onclick="nav('items',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📦</span></div>
+    <span class="bn-label">Товари</span>
+    <span class="bn-badge" id="bn-alert" style="display:none">!</span>
+  </div>
+  <div class="bn-item" data-page="issue" onclick="nav('issue',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📤</span></div>
+    <span class="bn-label">Видача</span>
+  </div>
+  <div class="bn-item" data-page="log" onclick="nav('log',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">🗒️</span></div>
+    <span class="bn-label">Журнал</span>
+  </div>
+  <div class="bn-item" data-page="add" onclick="nav('add',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">➕</span></div>
+    <span class="bn-label">Додати</span>
+  </div>
+  <div class="bn-item" data-page="stats" onclick="nav('stats',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📊</span></div>
+    <span class="bn-label">Звіт</span>
+  </div>
+</div>
+
+
+<script>
+// Вимикаємо SW повністю — він заважав оновленням
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  });
+  caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+}
+</script>
+</body>
+</html>
