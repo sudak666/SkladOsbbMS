@@ -183,7 +183,7 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 }
 
 /* ===MOBILE === */
-@media(max-width:600px){
+@media(max-width:768px){
   .sidebar{display:none!important;}
   .main{margin-left:0!important;padding-bottom:80px;}
   .topbar{padding:0 10px;height:50px;}
@@ -1791,6 +1791,8 @@ document.addEventListener('keydown',e=>{
 });
 
 loadItems().then(()=>loadLogs());
+// DEBUG: показати розмір екрану
+setTimeout(()=>toast('Екран: '+window.innerWidth+'x'+window.innerHeight,'success'),1000);
 </script>
 
 <!-- BOTTOM NAV (mobile) -->
