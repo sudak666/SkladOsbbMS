@@ -1495,8 +1495,20 @@ async function doAddNew(){
   const quantity=parseFloat(document.getElementById('newQty').value)||0;
   if(!name) return toast('Введіть назву товару!','error');
   if(/^\d+([.,]\d+)?$/.test(unit)) return toast('⚠️ "Одиниця" має бути словом (напр. "шт", "уп."), а не числом!','error');
-  const {error}=await db.from('inventory_items').insert([{name,category,unit,quantity}]);
+  const {data:newItem,error}=await db.from('inventory_items').insert([{name,category,unit,quantity}]).select().single();
   if(error) return toast('Помилка: '+error.message,'error');
+  // записуємо початковий прихід якщо кількість > 0
+  if(quantity>0 && newItem){
+    try{
+      await db.from('inventory_receipts').insert([{
+        item_id:newItem.id,
+        item_name:name,
+        quantity,
+        supplier:null,
+        note:'Початковий залишок при додаванні товару'
+      }]);
+    }catch(e){console.warn('receipt insert failed',e);}
+  }
   toast('✅ "'+name+'" додано!','success');
   ['newName','newUnit','newQty'].forEach(k=>document.getElementById(k).value='');
   await loadItems();populateSels();renderAddLow();
