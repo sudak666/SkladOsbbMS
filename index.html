@@ -149,7 +149,7 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 
 .log-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ios-sep);overflow:hidden;max-width:100%;min-width:0;}
 .log-row:last-child{border-bottom:none;}
-.log-icon{width:36px;height:36px;border-radius:10px;background:var(--ios-blue-light);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.log-icon{width:36px;height:36px;border-radius:10px;background:var(--ios-blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ios-blue);}
 
 .pbar{height:5px;background:var(--ios-gray6);border-radius:3px;overflow:hidden;margin-top:6px;}
 .pfill{height:100%;border-radius:3px;transition:width .4s;}
@@ -382,7 +382,7 @@ function pinPress(k){
     <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;font-size:15px;">📦 Товари на складі</h2>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
-      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік"><span class="ms" style="font-size:20px;">bar_chart</span></button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер"><span class="ms" style="font-size:20px;">qr_code_scanner</span></button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару"><span class="ms" style="font-size:20px;">move_to_inbox</span></button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
+      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік"><span class="ms" style="font-size:20px;">bar_chart</span></button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер"><span class="ms" style="font-size:20px;">qr_code_scanner</span></button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару"><span class="ms" style="font-size:20px;">move_to_inbox</span></button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()"><span class="ms" style="font-size:16px;vertical-align:-3px;">upload_file</span> Excel</button>
       <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="white-space:nowrap;"><span class="ms" style="font-size:18px;vertical-align:-4px;">sync</span> Оновити</button>
     </div>
   </div>
@@ -390,7 +390,7 @@ function pinPress(k){
   <!-- ITEMS -->
   <div id="page-items" class="page active">
     <div id="alertBanner" style="display:none;" onclick="nav('stats',document.querySelector('.ni[data-page=stats]'))">
-      <div class="alert-banner">🔔 <span id="alertText"></span> — натисніть щоб переглянути</div>
+      <div class="alert-banner"><span class="ms" style="font-size:16px;vertical-align:-3px;">notifications</span> <span id="alertText"></span> — натисніть щоб переглянути</div>
     </div>
     <div class="g4" style="margin-bottom:22px;">
       <div class="stat-card sc-purple" onclick="filterByStock('all',this)"><div class="big" id="st-total">—</div><div class="lbl">📦 Всі позиції</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">📦</div></div>
@@ -411,7 +411,7 @@ function pinPress(k){
         <button class="pill" onclick="filterCat(this,'Відеоспостереження')">📹 Відео</button>
         <button class="pill" onclick="filterCat(this,'Інше')">📦 Інше</button>
       </div>
-      <div class="sw" style="width:250px;min-width:160px;"><span class="si">🔍</span><input class="inp" id="searchInp" placeholder="Пошук..." oninput="renderItems()"></div>
+      <div class="sw" style="width:250px;min-width:160px;"><span class="si"><span class="ms" style="font-size:18px;">search</span></span><input class="inp" id="searchInp" placeholder="Пошук..." oninput="renderItems()"></div>
     </div>
     <div class="card desktop-table" style="overflow:hidden;">
       <table>
@@ -427,7 +427,7 @@ function pinPress(k){
   <div id="page-issue" class="page">
     <div class="split">
       <div class="card" style="padding:28px;">
-        <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;">➡️ Оформити видачу</h3>
+        <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;display:flex;align-items:center;gap:8px;"><span class="ms" style="color:var(--ios-blue);">output</span>Оформити видачу</h3>
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div><label>Товар</label><select class="inp" id="issueItemSel" onchange="onIssueSel()"><option value="">— Оберіть товар —</option></select></div>
           <div id="issueInfo" style="display:none;background:#f0f0ff;border-radius:12px;padding:14px;">
@@ -459,7 +459,7 @@ function pinPress(k){
         <button class="pill" onclick="filterLogCat(this,'Електрика')">⚡</button>
         <button class="pill" onclick="filterLogCat(this,'Сантехніка')">🚿</button>
       </div>
-      <div class="sw" style="width:240px;"><span class="si">🔍</span><input class="inp" id="logSearch" placeholder="Пошук..." oninput="renderLog()"></div>
+      <div class="sw" style="width:240px;"><span class="si"><span class="ms" style="font-size:18px;">search</span></span><input class="inp" id="logSearch" placeholder="Пошук..." oninput="renderLog()"></div>
     </div>
     <div class="card" style="overflow:hidden;">
       <table>
@@ -474,7 +474,7 @@ function pinPress(k){
   <div id="page-add" class="page">
     <div class="split">
       <div class="card" style="padding:28px;">
-        <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;">📦 Поповнити залишок</h3>
+        <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;display:flex;align-items:center;gap:8px;"><span class="ms" style="color:var(--ios-green);">add_circle</span>Поповнити залишок</h3>
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div><label>Товар</label><select class="inp" id="refillSel" onchange="onRefillSel()"><option value="">— Оберіть товар —</option></select></div>
           <div id="refillInfo" style="display:none;background:#f0fff4;border:1.5px solid #bbf7d0;border-radius:10px;padding:12px;font-size:13px;color:#166534;">Поточний залишок: <span id="refillCur" style="font-weight:800;"></span></div>
@@ -530,7 +530,7 @@ function pinPress(k){
         </div>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <div class="sw" style="flex:1;min-width:160px;max-width:280px;"><span class="si">🔍</span><input class="inp" id="auditSearch" placeholder="Пошук товару..." oninput="renderAuditList()"></div>
+        <div class="sw" style="flex:1;min-width:160px;max-width:280px;"><span class="si"><span class="ms" style="font-size:18px;">search</span></span><input class="inp" id="auditSearch" placeholder="Пошук товару..." oninput="renderAuditList()"></div>
         <div id="auditStats" style="font-size:12px;color:var(--ios-gray);"></div>
       </div>
     </div>
@@ -549,7 +549,7 @@ function pinPress(k){
   <!-- RECEIPTS -->
   <div id="page-receipts" class="page">
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
-      <div class="sw" style="width:250px;min-width:160px;"><span class="si">🔍</span><input class="inp" id="recSearch" placeholder="Пошук..." oninput="renderReceipts()"></div>
+      <div class="sw" style="width:250px;min-width:160px;"><span class="si"><span class="ms" style="font-size:18px;">search</span></span><input class="inp" id="recSearch" placeholder="Пошук..." oninput="renderReceipts()"></div>
     </div>
     <div class="card desktop-table" style="overflow:hidden;margin-bottom:16px;">
       <table>
@@ -563,10 +563,10 @@ function pinPress(k){
   <!-- STATS -->
   <div id="page-stats" class="page">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;" class="stats-grid">
-      <div class="card" style="padding:18px;"><div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:14px;">📊 По категоріях</div><div id="statCats" style="display:flex;flex-direction:column;gap:12px;"></div></div>
-      <div class="card" style="padding:18px;overflow:hidden;"><div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;margin-bottom:14px;">🔔 Потребують поповнення</div><div id="statLow" style="overflow:hidden;"></div></div>
+      <div class="card" style="padding:18px;"><div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px;"><span class="ms" style="font-size:16px;">bar_chart</span>По категоріях</div><div id="statCats" style="display:flex;flex-direction:column;gap:12px;"></div></div>
+      <div class="card" style="padding:18px;overflow:hidden;"><div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px;"><span class="ms" style="font-size:16px;color:#ef4444;">warning</span>Потребують поповнення</div><div id="statLow" style="overflow:hidden;"></div></div>
     </div>
-    <div class="card" style="padding:22px;"><div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:16px;">📋 Останні видачі</div><div id="statLog"></div></div>
+    <div class="card" style="padding:22px;"><div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:6px;"><span class="ms" style="font-size:16px;">history</span>Останні видачі</div><div id="statLog"></div></div>
   </div>
 </div>
 
@@ -782,7 +782,7 @@ let allItems=[],allLogs=[],curCat='',logCat='',quickId=null,photoItemId=null,del
 const catBadge={'Прибирання':'bc','Ремонт':'br','Електрика':'be','Сантехніка':'bp','Відеоспостереження':'bv','Інше':'bo'};
 const catIcon={'Прибирання':'🧹','Ремонт':'🔧','Електрика':'⚡','Сантехніка':'🚿','Відеоспостереження':'📹','Інше':'📦'};
 const catColor={'Прибирання':'#16a34a','Ремонт':'#ea580c','Електрика':'#ca8a04','Сантехніка':'#2563eb','Відеоспостереження':'#7c3aed','Інше':'#64748b'};
-const pageTitles={items:'📦 Товари на складі',issue:'➡️ Видача зі складу',log:'📋 Журнал видач',add:'➕ Додати / Поповнити',receipts:'📥 Прихід товару',audit:'📋 Інвентаризація',stats:'📊 Статистика'};
+const pageTitles={items:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">inventory_2</span>Товари на складі',issue:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">output</span>Видача зі складу',log:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">receipt_long</span>Журнал видач',add:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">add_circle</span>Додати / Поповнити',receipts:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">move_to_inbox</span>Прихід товару',audit:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">fact_check</span>Інвентаризація',stats:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">bar_chart</span>Статистика'};
 
 // ===== PIN AUTH (визначено вище перед HTML) =====
 if(sessionStorage.getItem('auth')==='ok') document.getElementById('authScreen').style.display='none';
@@ -793,7 +793,7 @@ function nav(page,el){
   document.querySelectorAll('.ni,.bn-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.querySelectorAll('.ni[data-page='+page+'],.bn-item[data-page='+page+']').forEach(n=>n.classList.add('active'));
-  document.getElementById('pageTitle').textContent=pageTitles[page]||'';
+  document.getElementById('pageTitle').innerHTML=pageTitles[page]||'';
   if(page==='issue'){populateSels();loadRecentIssues();}
   if(page==='log'){loadLogs();}
   if(page==='add'){populateSels();renderAddLow();}
@@ -1037,7 +1037,7 @@ function checkAlerts(){
     if(zero>0) txt+=zero+' товар(ів) закінчились';
     if(zero>0&&low>0) txt+=', ';
     if(low>0) txt+=low+' товар(ів) на межі';
-    document.getElementById('alertText').textContent='🔔 '+txt;
+    document.getElementById('alertText').textContent=txt;
   } else {
     if(sb) sb.style.display='none';
     if(bnA) bnA.style.display='none';
@@ -1215,7 +1215,7 @@ async function loadRecentIssues(){
   el.innerHTML=data.map(l=>{
     const d=new Date(l.issued_at);
     const dt=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="log-row"><div class="log-icon">📤</div>
+    return `<div class="log-row"><div class="log-icon"><span class="ms" style="font-size:18px;">output</span></div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;color:#1e1b4b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.item_name}</div>
         <div style="font-size:11px;color:#a5b4fc;">${l.issued_to} · ${dt}</div>
@@ -1375,7 +1375,7 @@ function renderReceipts(){
     const dt=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
     const item=allItems.find(i=>i.id===r.item_id);
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f3f4f6;">
-      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📥</div>
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ios-green);"><span class="ms" style="font-size:20px;">move_to_inbox</span></div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:600;color:#1e1b4b;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.item_name}</div>
         <div style="font-size:11px;color:#a5b4fc;margin-top:1px;">${r.supplier||'—'} · ${dt}${r.note?' · '+r.note:''}</div>
