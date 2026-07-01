@@ -300,7 +300,7 @@ canvas#stockChart{width:100%!important;max-height:300px;}
 <!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
-    <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+    <div style="margin-bottom:12px;"><span class="ms" style="font-size:48px;">storefront</span></div>
     <h1>Склад ОСББ</h1>
     <p>Микитська Слобода</p>
     <div class="auth-dots" id="authDots">
@@ -320,9 +320,9 @@ canvas#stockChart{width:100%!important;max-height:300px;}
       <button class="pin-key" onclick="pinPress('7')">7</button>
       <button class="pin-key" onclick="pinPress('8')">8</button>
       <button class="pin-key" onclick="pinPress('9')">9</button>
-      <button class="pin-key" style="font-size:14px;" onclick="pinPress('C')">✕</button>
+      <button class="pin-key" onclick="pinPress('C')"><span class="ms" style="font-size:20px;">close</span></button>
       <button class="pin-key" onclick="pinPress('0')">0</button>
-      <button class="pin-key" style="font-size:14px;" onclick="pinPress('DEL')">⌫</button>
+      <button class="pin-key" onclick="pinPress('DEL')"><span class="ms" style="font-size:20px;">backspace</span></button>
     </div>
   </div>
 </div>
@@ -359,7 +359,7 @@ async function checkPin(attempt){
     pinBusy=false;
   } else {
     pinFails++;
-    document.getElementById('authErr').textContent='❌ Невірний PIN-код';
+    document.getElementById('authErr').innerHTML='<span class="ms" style="font-size:14px;vertical-align:-2px;">cancel</span> Невірний PIN-код';
     const box=document.querySelector('.auth-box');
     box.style.animation='shake .4s';
     setTimeout(()=>box.style.animation='',400);
@@ -376,7 +376,7 @@ async function checkPin(attempt){
 
 <div class="sidebar">
   <div class="sb-logo">
-    <div style="font-size:32px;margin-bottom:6px;">🏪</div>
+    <div style="margin-bottom:6px;"><span class="ms" style="font-size:32px;color:var(--ios-blue);">storefront</span></div>
     <h1>Склад ОСББ</h1>
     <p>Микитська Слобода</p>
     <span class="sb-ver">v3.1</span>
@@ -398,7 +398,7 @@ async function checkPin(attempt){
 
 <div class="main">
   <div class="topbar">
-    <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;font-size:15px;">📦 Товари на складі</h2>
+    <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;font-size:15px;"><span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">inventory_2</span>Товари на складі</h2>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
       <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік"><span class="ms" style="font-size:20px;">bar_chart</span></button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер"><span class="ms" style="font-size:20px;">qr_code_scanner</span></button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару"><span class="ms" style="font-size:20px;">move_to_inbox</span></button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()"><span class="ms" style="font-size:16px;vertical-align:-3px;">upload_file</span> Excel</button>
@@ -412,10 +412,10 @@ async function checkPin(attempt){
       <div class="alert-banner"><span class="ms" style="font-size:16px;vertical-align:-3px;">notifications</span> <span id="alertText"></span> — натисніть щоб переглянути</div>
     </div>
     <div class="g4" style="margin-bottom:22px;">
-      <div class="stat-card sc-purple" onclick="filterByStock('all',this)"><div class="big" id="st-total">—</div><div class="lbl">📦 Всі позиції</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">📦</div></div>
-      <div class="stat-card sc-red" onclick="filterByStock('zero',this)"><div class="big" id="st-zero">—</div><div class="lbl">❌ Закінчились</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">🚫</div></div>
-      <div class="stat-card sc-orange" onclick="filterByStock('low',this)"><div class="big" id="st-low">—</div><div class="lbl">⚠️ Мало залишилось</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">⚠️</div></div>
-      <div class="stat-card sc-green" onclick="filterByStock('ok',this)"><div class="big" id="st-ok">—</div><div class="lbl">✅ В нормі</div><div style="position:absolute;right:14px;top:14px;font-size:28px;opacity:.25;">✅</div></div>
+      <div class="stat-card sc-purple" onclick="filterByStock('all',this)"><div class="big" id="st-total">—</div><div class="lbl"><span class="ms" style="font-size:13px;vertical-align:-2px;">inventory_2</span> Всі позиції</div><div style="position:absolute;right:14px;top:14px;opacity:.25;"><span class="ms" style="font-size:28px;">inventory_2</span></div></div>
+      <div class="stat-card sc-red" onclick="filterByStock('zero',this)"><div class="big" id="st-zero">—</div><div class="lbl"><span class="ms" style="font-size:13px;vertical-align:-2px;">production_quantity_limits</span> Закінчились</div><div style="position:absolute;right:14px;top:14px;opacity:.25;"><span class="ms" style="font-size:28px;">production_quantity_limits</span></div></div>
+      <div class="stat-card sc-orange" onclick="filterByStock('low',this)"><div class="big" id="st-low">—</div><div class="lbl"><span class="ms" style="font-size:13px;vertical-align:-2px;">warning</span> Мало залишилось</div><div style="position:absolute;right:14px;top:14px;opacity:.25;"><span class="ms" style="font-size:28px;">warning</span></div></div>
+      <div class="stat-card sc-green" onclick="filterByStock('ok',this)"><div class="big" id="st-ok">—</div><div class="lbl"><span class="ms" style="font-size:13px;vertical-align:-2px;">check_circle</span> В нормі</div><div style="position:absolute;right:14px;top:14px;opacity:.25;"><span class="ms" style="font-size:28px;">check_circle</span></div></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -423,12 +423,12 @@ async function checkPin(attempt){
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills" class="pills-wrap">
         <button class="pill active" onclick="filterCat(this,'')">Всі</button>
-        <button class="pill" onclick="filterCat(this,'Прибирання')">🧹 Прибирання</button>
-        <button class="pill" onclick="filterCat(this,'Ремонт')">🔧 Ремонт</button>
-        <button class="pill" onclick="filterCat(this,'Електрика')">⚡ Електрика</button>
-        <button class="pill" onclick="filterCat(this,'Сантехніка')">🚿 Сантехніка</button>
-        <button class="pill" onclick="filterCat(this,'Відеоспостереження')">📹 Відео</button>
-        <button class="pill" onclick="filterCat(this,'Інше')">📦 Інше</button>
+        <button class="pill" onclick="filterCat(this,'Прибирання')"><span class="ms" style="font-size:15px;vertical-align:-3px;">cleaning_services</span> Прибирання</button>
+        <button class="pill" onclick="filterCat(this,'Ремонт')"><span class="ms" style="font-size:15px;vertical-align:-3px;">build</span> Ремонт</button>
+        <button class="pill" onclick="filterCat(this,'Електрика')"><span class="ms" style="font-size:15px;vertical-align:-3px;">bolt</span> Електрика</button>
+        <button class="pill" onclick="filterCat(this,'Сантехніка')"><span class="ms" style="font-size:15px;vertical-align:-3px;">plumbing</span> Сантехніка</button>
+        <button class="pill" onclick="filterCat(this,'Відеоспостереження')"><span class="ms" style="font-size:15px;vertical-align:-3px;">videocam</span> Відео</button>
+        <button class="pill" onclick="filterCat(this,'Інше')"><span class="ms" style="font-size:15px;vertical-align:-3px;">inventory_2</span> Інше</button>
       </div>
       <div class="sw" style="width:250px;min-width:160px;"><span class="si"><span class="ms" style="font-size:18px;">search</span></span><input class="inp" id="searchInp" placeholder="Пошук..." oninput="renderItems()"></div>
     </div>
@@ -458,7 +458,7 @@ async function checkPin(attempt){
           </div>
           <div><label>Кому видано</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;"><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Електрик',this)">Електрик</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Сантехнік',this)">Сантехнік</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Двірник',this)">Двірник</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Охорона',this)">Охорона</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Прибиральниця',this)">Прибиральниця</button></div><input type="text" class="inp" id="issuePersonI" placeholder="або введіть вручну..."></div>
           <div><label>Примітка</label><input type="text" class="inp" id="issueNoteI" placeholder="Для якого об'єкту або завдання"></div>
-          <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doIssue()">✅ Видати зі складу</button>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doIssue()"><span class="ms" style="font-size:16px;vertical-align:-3px;">check_circle</span> Видати зі складу</button>
         </div>
       </div>
       <div class="card" style="padding:20px;overflow:hidden;max-width:100%;">
@@ -473,10 +473,10 @@ async function checkPin(attempt){
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;" class="pills-wrap">
         <button class="pill active" onclick="filterLogCat(this,'')">Всі</button>
-        <button class="pill" onclick="filterLogCat(this,'Прибирання')">🧹</button>
-        <button class="pill" onclick="filterLogCat(this,'Ремонт')">🔧</button>
-        <button class="pill" onclick="filterLogCat(this,'Електрика')">⚡</button>
-        <button class="pill" onclick="filterLogCat(this,'Сантехніка')">🚿</button>
+        <button class="pill" onclick="filterLogCat(this,'Прибирання')"><span class="ms" style="font-size:15px;">cleaning_services</span></button>
+        <button class="pill" onclick="filterLogCat(this,'Ремонт')"><span class="ms" style="font-size:15px;">build</span></button>
+        <button class="pill" onclick="filterLogCat(this,'Електрика')"><span class="ms" style="font-size:15px;">bolt</span></button>
+        <button class="pill" onclick="filterLogCat(this,'Сантехніка')"><span class="ms" style="font-size:15px;">plumbing</span></button>
       </div>
       <div class="sw" style="width:240px;"><span class="si"><span class="ms" style="font-size:18px;">search</span></span><input class="inp" id="logSearch" placeholder="Пошук..." oninput="renderLog()"></div>
     </div>
@@ -500,33 +500,33 @@ async function checkPin(attempt){
           <div><label>Кількість</label><input type="number" class="inp" id="refillQtyI" min="0.1" step="0.1" placeholder="0"></div>
           <div><label>Постачальник <span style="color:var(--ios-gray);font-weight:400;">(необов'язково)</span></label><input type="text" class="inp" id="refillSupplierI" placeholder="Напр.: Епіцентр, Епіцентр К"></div>
           <div><label>Примітка <span style="color:var(--ios-gray);font-weight:400;">(необов'язково)</span></label><input type="text" class="inp" id="refillNoteI" placeholder="Накладна, коментар..."></div>
-          <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="doRefill()">➕ Поповнити</button>
+          <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="doRefill()"><span class="ms" style="font-size:16px;vertical-align:-3px;">add</span> Поповнити</button>
         </div>
         <div style="margin-top:32px;padding-top:24px;border-top:1px solid #f0eeff;">
-          <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;">🆕 Новий товар</h3>
+          <h3 style="font-size:17px;font-weight:800;color:#1e1b4b;margin-bottom:22px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">fiber_new</span> Новий товар</h3>
           <div style="display:flex;flex-direction:column;gap:14px;">
-            <div><label>Назва / артикул</label><input type="text" class="inp" id="newName" placeholder="Напр.: Лампа LED 10W E27"><button class="btn btn-ghost" onclick="openBarcodeAddScanner()" style="width:100%;justify-content:center;margin-top:8px;padding:9px;font-size:13px;border-style:dashed;">📷 Сканувати штрих-код товару</button><div id="barcodeAddStatus" style="display:none;margin-top:6px;font-size:12px;color:#15803d;font-weight:600;"></div></div>
+            <div><label>Назва / артикул</label><input type="text" class="inp" id="newName" placeholder="Напр.: Лампа LED 10W E27"><button class="btn btn-ghost" onclick="openBarcodeAddScanner()" style="width:100%;justify-content:center;margin-top:8px;padding:9px;font-size:13px;border-style:dashed;"><span class="ms" style="font-size:14px;vertical-align:-2px;">qr_code_scanner</span> Сканувати штрих-код товару</button><div id="barcodeAddStatus" style="display:none;margin-top:6px;font-size:12px;color:#15803d;font-weight:600;"></div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" class="two-col">
-              <div><label>Категорія</label><select class="inp" id="newCat"><option value="Прибирання">🧹 Прибирання</option><option value="Ремонт">🔧 Ремонт</option><option value="Електрика">⚡ Електрика</option><option value="Сантехніка">🚿 Сантехніка</option><option value="Відеоспостереження">📹 Відеоспостереження</option><option value="Інше">📦 Інше</option></select></div>
-              <div><label>Одиниця</label><input type="text" class="inp" id="newUnit" placeholder="шт, уп., м.п." inputmode="text" onblur="if(/^\d+([.,]\d+)?$/.test(this.value.trim())) toast('⚠️ Одиниця має бути словом, не числом!','error');"></div>
+              <div><label>Категорія</label><select class="inp" id="newCat"><option value="Прибирання">Прибирання</option><option value="Ремонт">Ремонт</option><option value="Електрика">Електрика</option><option value="Сантехніка">Сантехніка</option><option value="Відеоспостереження">Відеоспостереження</option><option value="Інше">Інше</option></select></div>
+              <div><label>Одиниця</label><input type="text" class="inp" id="newUnit" placeholder="шт, уп., м.п." inputmode="text" onblur="if(/^\d+([.,]\d+)?$/.test(this.value.trim())) toast('Одиниця має бути словом, не числом!','error');"></div>
             </div>
             <div><label>Початкова к-сть</label><input type="number" class="inp" id="newQty" min="0" step="0.1" placeholder="0"></div>
-            <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doAddNew()">✅ Додати товар</button>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doAddNew()"><span class="ms" style="font-size:16px;vertical-align:-3px;">check_circle</span> Додати товар</button>
           </div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px;" class="pc-only">
         <div class="card" style="padding:20px;background:linear-gradient(135deg,#f0f0ff,#ede9fe);">
-          <div style="font-size:13px;font-weight:700;color:#4c1d95;margin-bottom:10px;">💡 Підказки</div>
+          <div style="font-size:13px;font-weight:700;color:#4c1d95;margin-bottom:10px;"><span class="ms" style="font-size:15px;vertical-align:-3px;">lightbulb</span> Підказки</div>
           <ul style="font-size:12.5px;color:#6b21a8;line-height:2.2;list-style:none;padding:0;margin:0;">
-            <li>📤 <b>Excel</b> — на ПК, кнопка вгорі</li>
-            <li>📷 <b>Фото</b> — клік 📷 в таблиці товарів</li>
-            <li>🗑️ <b>Видалення</b> — кнопка 🗑️ в рядку</li>
-            <li>🔔 <b>Сповіщення</b> — автоматично</li>
+            <li><span class="ms" style="font-size:14px;vertical-align:-2px;">upload_file</span> <b>Excel</b> — на ПК, кнопка вгорі</li>
+            <li><span class="ms" style="font-size:14px;vertical-align:-2px;">photo_camera</span> <b>Фото</b> — клік <span class="ms" style="font-size:14px;vertical-align:-2px;">photo_camera</span> в таблиці товарів</li>
+            <li><span class="ms" style="font-size:14px;vertical-align:-2px;">delete</span> <b>Видалення</b> — кнопка <span class="ms" style="font-size:14px;vertical-align:-2px;">delete</span> в рядку</li>
+            <li><span class="ms" style="font-size:14px;vertical-align:-2px;">notifications</span> <b>Сповіщення</b> — автоматично</li>
           </ul>
         </div>
         <div class="card" style="padding:20px;">
-          <div style="font-size:12px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">⚠️ Потребують поповнення</div>
+          <div style="font-size:12px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;"><span class="ms" style="font-size:14px;vertical-align:-2px;">warning</span> Потребують поповнення</div>
           <div id="addLowList"></div>
         </div>
       </div>
@@ -539,13 +539,13 @@ async function checkPin(attempt){
     <div class="card" style="padding:16px 20px;margin-bottom:12px;">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
         <div>
-          <div style="font-size:17px;font-weight:800;color:var(--ios-label);letter-spacing:-.3px;">📋 Інвентаризація складу</div>
+          <div style="font-size:17px;font-weight:800;color:var(--ios-label);letter-spacing:-.3px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">fact_check</span> Інвентаризація складу</div>
           <div id="auditDate" style="font-size:12px;color:var(--ios-gray);margin-top:2px;"></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" onclick="auditFillZeros()" title="Обнулити всі поля">⬜ Очистити</button>
-          <button class="btn btn-ghost btn-sm" onclick="auditFillCurrent()" title="Підставити поточні залишки">📋 Підставити поточні</button>
-          <button class="btn btn-primary" onclick="openAuditConfirm()" style="font-weight:700;">✅ Завершити інвентаризацію</button>
+          <button class="btn btn-ghost btn-sm" onclick="auditFillZeros()" title="Обнулити всі поля"><span class="ms" style="font-size:14px;vertical-align:-2px;">clear_all</span> Очистити</button>
+          <button class="btn btn-ghost btn-sm" onclick="auditFillCurrent()" title="Підставити поточні залишки"><span class="ms" style="font-size:14px;vertical-align:-2px;">content_paste</span> Підставити поточні</button>
+          <button class="btn btn-primary" onclick="openAuditConfirm()" style="font-weight:700;"><span class="ms" style="font-size:16px;vertical-align:-3px;">check_circle</span> Завершити інвентаризацію</button>
         </div>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -599,7 +599,7 @@ async function checkPin(attempt){
       <div><label>Кому видано</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;"><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Електрик',this)">Електрик</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Сантехнік',this)">Сантехнік</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Двірник',this)">Двірник</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Охорона',this)">Охорона</button><button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;" onclick="setPerson('Прибиральниця',this)">Прибиральниця</button></div><input type="text" class="inp" id="qmPersonI" placeholder="або введіть вручну..."></div>
       <div style="display:flex;gap:10px;margin-top:4px;">
         <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('qModal')">Скасувати</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="doQuickIssue()">✅ Видати</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="doQuickIssue()"><span class="ms" style="font-size:16px;vertical-align:-3px;">check_circle</span> Видати</button>
       </div>
     </div>
   </div>
@@ -611,13 +611,13 @@ async function checkPin(attempt){
     <h3 id="photoItemName" style="font-size:15px;line-height:1.4;margin-bottom:14px;color:#1e1b4b;"></h3>
     <div id="photoCurrent" style="margin-bottom:14px;"></div>
     <div style="border:2px dashed #c4b5fd;border-radius:12px;padding:20px;text-align:center;background:#faf8ff;">
-      <div style="font-size:13px;color:#6366f1;margin-bottom:10px;font-weight:600;">📷 Завантажити нове фото</div>
+      <div style="font-size:13px;color:#6366f1;margin-bottom:10px;font-weight:600;"><span class="ms" style="font-size:15px;vertical-align:-3px;">photo_camera</span> Завантажити нове фото</div>
       <input type="file" id="photoFileI" accept="image/*" style="display:none;" onchange="uploadPhoto()">
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('photoFileI').click()">Обрати файл</button>
       <div id="photoStatus" style="font-size:12px;color:#a5b4fc;margin-top:8px;"></div>
     </div>
     <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn btn-danger btn-sm" id="delPhotoBtn" onclick="deletePhoto()" style="display:none;">🗑️ Видалити фото</button>
+      <button class="btn btn-danger btn-sm" id="delPhotoBtn" onclick="deletePhoto()" style="display:none;"><span class="ms" style="font-size:14px;vertical-align:-2px;">delete</span> Видалити фото</button>
       <button class="btn btn-ghost btn-sm" onclick="closeModal('photoModal')">Закрити</button>
     </div>
   </div>
@@ -626,12 +626,12 @@ async function checkPin(attempt){
 <!-- DELETE MODAL -->
 <div class="modal-bg" id="delModal" onclick="closeModal('delModal',event)">
   <div class="modal" style="width:380px;">
-    <h3 style="color:#ef4444;margin-bottom:8px;">🗑️ Видалити товар?</h3>
+    <h3 style="color:#ef4444;margin-bottom:8px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">delete</span> Видалити товар?</h3>
     <p id="delItemName" style="font-size:14px;color:#4b5563;margin-bottom:10px;line-height:1.5;"></p>
     <p style="font-size:12px;color:#9ca3af;margin-bottom:20px;">Цю дію неможливо скасувати. Записи в журналі збережуться.</p>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('delModal')">Скасувати</button>
-      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDelete()">🗑️ Видалити</button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDelete()"><span class="ms" style="font-size:16px;vertical-align:-3px;">delete</span> Видалити</button>
     </div>
   </div>
 </div>
@@ -639,12 +639,12 @@ async function checkPin(attempt){
 <!-- AUDIT CONFIRM MODAL -->
 <div class="modal-bg" id="auditModal" onclick="closeModal('auditModal',event)">
   <div class="modal" style="width:420px;">
-    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:6px;letter-spacing:-.3px;">✅ Завершити інвентаризацію</h3>
+    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:6px;letter-spacing:-.3px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">check_circle</span> Завершити інвентаризацію</h3>
     <div id="auditSummary" style="background:var(--ios-bg);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.7;"></div>
     <div><label>Примітка до інвентаризації</label><input type="text" class="inp" id="auditNote" placeholder="Напр.: Планова інвентаризація червень 2026"></div>
     <div style="display:flex;gap:10px;margin-top:16px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('auditModal')">Скасувати</button>
-      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmAudit()">💾 Зберегти і оновити</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmAudit()"><span class="ms" style="font-size:16px;vertical-align:-3px;">save</span> Зберегти і оновити</button>
     </div>
   </div>
 </div>
@@ -652,12 +652,12 @@ async function checkPin(attempt){
 <!-- DELETE LOG MODAL -->
 <div class="modal-bg" id="delLogModal" onclick="closeModal('delLogModal',event)">
   <div class="modal" style="width:380px;">
-    <h3 style="color:#ef4444;margin-bottom:8px;">🗑️ Видалити запис видачі?</h3>
+    <h3 style="color:#ef4444;margin-bottom:8px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">delete</span> Видалити запис видачі?</h3>
     <p id="delLogItemName" style="font-size:14px;color:#4b5563;margin-bottom:10px;line-height:1.5;"></p>
     <p style="font-size:12px;color:#9ca3af;margin-bottom:20px;">Товар буде повернуто на склад (кількість збільшиться). Цю дію неможливо скасувати.</p>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('delLogModal')">Скасувати</button>
-      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDeleteLog()">🗑️ Видалити</button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDeleteLog()"><span class="ms" style="font-size:16px;vertical-align:-3px;">delete</span> Видалити</button>
     </div>
   </div>
 </div>
@@ -665,7 +665,7 @@ async function checkPin(attempt){
 <!-- EDIT LOG MODAL -->
 <div class="modal-bg" id="editLogModal" onclick="closeModal('editLogModal',event)">
   <div class="modal" style="width:400px;">
-    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:4px;letter-spacing:-.3px;">✏️ Редагувати видачу</h3>
+    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:4px;letter-spacing:-.3px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">edit</span> Редагувати видачу</h3>
     <p id="editLogItemName" style="font-size:13px;color:var(--ios-gray);margin-bottom:18px;"></p>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div>
@@ -684,7 +684,7 @@ async function checkPin(attempt){
     <p style="font-size:12px;color:var(--ios-gray);margin-top:12px;">При зміні кількості залишок товару на складі буде скориговано автоматично.</p>
     <div style="display:flex;gap:10px;margin-top:18px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('editLogModal')">Скасувати</button>
-      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmEditLog()">✅ Зберегти</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmEditLog()"><span class="ms" style="font-size:16px;vertical-align:-3px;">save</span> Зберегти</button>
     </div>
   </div>
 </div>
@@ -692,12 +692,12 @@ async function checkPin(attempt){
 <!-- DELETE RECEIPT MODAL -->
 <div class="modal-bg" id="delReceiptModal" onclick="closeModal('delReceiptModal',event)">
   <div class="modal" style="width:380px;">
-    <h3 style="color:#ef4444;margin-bottom:8px;">🗑️ Видалити запис приходу?</h3>
+    <h3 style="color:#ef4444;margin-bottom:8px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">delete</span> Видалити запис приходу?</h3>
     <p id="delReceiptItemName" style="font-size:14px;color:#4b5563;margin-bottom:10px;line-height:1.5;"></p>
     <p style="font-size:12px;color:#9ca3af;margin-bottom:20px;">Залишок товару на складі буде зменшено. Цю дію неможливо скасувати.</p>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('delReceiptModal')">Скасувати</button>
-      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDeleteReceipt()">🗑️ Видалити</button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;" onclick="confirmDeleteReceipt()"><span class="ms" style="font-size:16px;vertical-align:-3px;">delete</span> Видалити</button>
     </div>
   </div>
 </div>
@@ -705,7 +705,7 @@ async function checkPin(attempt){
 <!-- EDIT RECEIPT MODAL -->
 <div class="modal-bg" id="editReceiptModal" onclick="closeModal('editReceiptModal',event)">
   <div class="modal" style="width:400px;">
-    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:4px;letter-spacing:-.3px;">✏️ Редагувати прихід</h3>
+    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:4px;letter-spacing:-.3px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">edit</span> Редагувати прихід</h3>
     <p id="editReceiptItemName" style="font-size:13px;color:var(--ios-gray);margin-bottom:18px;"></p>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div>
@@ -724,7 +724,7 @@ async function checkPin(attempt){
     <p style="font-size:12px;color:var(--ios-gray);margin-top:12px;">При зміні кількості залишок товару на складі буде скориговано автоматично.</p>
     <div style="display:flex;gap:10px;margin-top:18px;">
       <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('editReceiptModal')">Скасувати</button>
-      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmEditReceipt()">✅ Зберегти</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="confirmEditReceipt()"><span class="ms" style="font-size:16px;vertical-align:-3px;">save</span> Зберегти</button>
     </div>
   </div>
 </div>
@@ -737,20 +737,20 @@ async function checkPin(attempt){
 <!-- BARCODE ADD MODAL -->
 <div class="modal-bg" id="barcodeAddModal" onclick="closeModal('barcodeAddModal',event)">
   <div class="modal">
-    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:14px;letter-spacing:-.3px;">📷 Сканер штрих-коду</h3>
+    <h3 style="font-size:17px;font-weight:700;color:var(--ios-label);margin-bottom:14px;letter-spacing:-.3px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">qr_code_scanner</span> Сканер штрих-коду</h3>
     <div id="barcodeAddReader"></div>
     <div id="barcodeAddScanning" style="text-align:center;font-size:13px;color:var(--ios-gray);padding:10px 0;">Наведіть камеру на штрих-код товару</div>
     <div class="barcode-not-found" id="barcodeNotFound">
-      ⚠️ Товар не знайдено в базі.
-      <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center;" onclick="searchInGoogle()">🔍 Шукати в Google</button>
-      <button class="btn btn-ghost btn-sm" style="margin-top:6px;width:100%;justify-content:center;" onclick="resetBarcodeScanner()">🔄 Сканувати ще раз</button>
+      <span class="ms" style="font-size:15px;vertical-align:-3px;">warning</span> Товар не знайдено в базі.
+      <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center;" onclick="searchInGoogle()"><span class="ms" style="font-size:16px;vertical-align:-3px;">search</span> Шукати в Google</button>
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px;width:100%;justify-content:center;" onclick="resetBarcodeScanner()"><span class="ms" style="font-size:16px;vertical-align:-3px;">refresh</span> Сканувати ще раз</button>
     </div>
     <!-- Ручне введення -->
     <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ios-sep);">
-      <div style="font-size:12px;color:var(--ios-gray);margin-bottom:8px;font-weight:500;">✏️ Або введіть штрих-код вручну</div>
+      <div style="font-size:12px;color:var(--ios-gray);margin-bottom:8px;font-weight:500;"><span class="ms" style="font-size:14px;vertical-align:-2px;">edit</span> Або введіть штрих-код вручну</div>
       <div style="display:flex;gap:8px;">
         <input type="number" id="manualBarcodeI" class="inp" placeholder="4820000000000" style="flex:1;font-size:15px;">
-        <button class="btn btn-primary btn-sm" onclick="searchManualBarcode()" style="flex-shrink:0;white-space:nowrap;">🔍 Google</button>
+        <button class="btn btn-primary btn-sm" onclick="searchManualBarcode()" style="flex-shrink:0;white-space:nowrap;"><span class="ms" style="font-size:16px;vertical-align:-3px;">search</span> Google</button>
       </div>
     </div>
     <div style="margin-top:12px;">
@@ -762,7 +762,7 @@ async function checkPin(attempt){
 <!-- QR SCANNER MODAL -->
 <div class="modal-bg" id="qrModal" onclick="closeModal('qrModal',event)">
   <div class="modal">
-    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:14px;">📷 Сканер штрих-коду</h3>
+    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:14px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">qr_code_scanner</span> Сканер штрих-коду</h3>
     <div id="qrReader"></div>
     <div class="qr-result" id="qrResult"></div>
     <p style="font-size:12px;color:#a5b4fc;margin-top:10px;text-align:center;">Наведіть камеру на штрих-код або QR-код товару</p>
@@ -785,7 +785,7 @@ async function checkPin(attempt){
 <!-- CHART MODAL -->
 <div class="modal-bg" id="chartModal" onclick="closeModal('chartModal',event)">
   <div class="modal">
-    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:16px;">📊 Залишки по категоріях</h3>
+    <h3 style="font-size:16px;font-weight:800;color:#1e1b4b;margin-bottom:16px;"><span class="ms" style="font-size:18px;vertical-align:-4px;">bar_chart</span> Залишки по категоріях</h3>
     <canvas id="stockChart"></canvas>
     <button class="btn btn-ghost btn-sm" style="margin-top:16px;" onclick="closeModal('chartModal')">Закрити</button>
   </div>
@@ -798,6 +798,13 @@ let allItems=[],allLogs=[],curCat='',logCat='',quickId=null,photoItemId=null,del
 const catBadge={'Прибирання':'bc','Ремонт':'br','Електрика':'be','Сантехніка':'bp','Відеоспостереження':'bv','Інше':'bo'};
 const catIcon={'Прибирання':'🧹','Ремонт':'🔧','Електрика':'⚡','Сантехніка':'🚿','Відеоспостереження':'📹','Інше':'📦'};
 const catColor={'Прибирання':'#16a34a','Ремонт':'#ea580c','Електрика':'#ca8a04','Сантехніка':'#2563eb','Відеоспостереження':'#7c3aed','Інше':'#64748b'};
+// HTML-рендер іконок Material Symbols. catIcon (emoji) лишається окремо для Chart.js,
+// оскільки canvas-легенда графіка не вміє рендерити HTML-теги.
+function msIcon(name,size){return '<span class="ms" style="font-size:'+(size||'1em')+';vertical-align:-0.15em;">'+name+'</span>';}
+const catIconName={'Прибирання':'cleaning_services','Ремонт':'build','Електрика':'bolt','Сантехніка':'plumbing','Відеоспостереження':'videocam','Інше':'inventory_2'};
+const catIconHtml={};
+Object.keys(catIconName).forEach(k=>catIconHtml[k]=msIcon(catIconName[k]));
+const catIconHtmlDefault=msIcon(catIconName['Інше']);
 const pageTitles={items:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">inventory_2</span>Товари на складі',issue:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">output</span>Видача зі складу',log:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">receipt_long</span>Журнал видач',add:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">add_circle</span>Додати / Поповнити',receipts:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">move_to_inbox</span>Прихід товару',audit:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">fact_check</span>Інвентаризація',stats:'<span class="ms" style="font-size:18px;vertical-align:-4px;margin-right:6px;">bar_chart</span>Статистика'};
 
 // ===== PIN AUTH (визначено вище перед HTML) =====
@@ -849,7 +856,7 @@ function renderAuditList(){
     `Перераховано: ${counted}/${allItems.length} · ▲ Надлишок: ${surplus} · ▼ Нестача: ${shortage}`;
 
   const list=document.getElementById('auditList');
-  if(!items.length){list.innerHTML='<div class="empty">📭 Нічого не знайдено</div>';return;}
+  if(!items.length){list.innerHTML='<div class="empty"><span class="ms" style="font-size:16px;vertical-align:-3px;">search_off</span> Нічого не знайдено</div>';return;}
 
   list.innerHTML=items.map(item=>{
     const actual=auditData[item.id];
@@ -859,10 +866,10 @@ function renderAuditList(){
     if(isCounted){
       if(diff>0){bg='#f0fdf4';border='#86efac';diffHtml=`<span style="color:var(--ios-green);font-weight:700;font-size:12px;">▲ +${diff}</span>`;}
       else if(diff<0){bg='#fef2f2';border='#fca5a5';diffHtml=`<span style="color:var(--ios-red);font-weight:700;font-size:12px;">▼ ${diff}</span>`;}
-      else{bg='#f0fdf4';border='#86efac';diffHtml=`<span style="color:var(--ios-green);font-size:12px;">✓ Збігається</span>`;}
+      else{bg='#f0fdf4';border='#86efac';diffHtml=`<span style="color:var(--ios-green);font-size:12px;"><span class="ms" style="font-size:13px;vertical-align:-2px;">check</span> Збігається</span>`;}
     }
     const cat=item.category||'';
-    const icon=catIcon[cat]||'📦';
+    const icon=catIconHtml[cat]||catIconHtmlDefault;
     return `<div style="background:${bg};border:1.5px solid ${border};border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:all .2s;">
       <div style="font-size:22px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
@@ -885,7 +892,7 @@ function renderAuditList(){
             onfocus="this.select()">
           <span style="font-size:11px;color:var(--ios-gray);">${item.unit}</span>
         </div>
-        ${isCounted?`<button onclick="clearAuditItem(${item.id})" style="font-size:10px;color:var(--ios-gray);background:none;border:none;cursor:pointer;padding:0;">✕ скинути</button>`:''}
+        ${isCounted?`<button onclick="clearAuditItem(${item.id})" style="font-size:10px;color:var(--ios-gray);background:none;border:none;cursor:pointer;padding:0;"><span class="ms" style="font-size:12px;vertical-align:-2px;">close</span> скинути</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -930,7 +937,7 @@ function clearAuditItem(itemId){
 function auditFillCurrent(){
   allItems.forEach(i=>{ auditData[i.id]=i.quantity; });
   renderAuditList();
-  toast('📋 Підставлено поточні залишки','success');
+  toast('Підставлено поточні залишки','success');
 }
 
 function auditFillZeros(){
@@ -964,7 +971,7 @@ function openAuditConfirm(){
         <div style="font-size:11px;color:var(--ios-gray);">Нестача</div>
       </div>
     </div>
-    ${uncounted.length>0?`<div style="margin-top:10px;font-size:12px;color:#f59e0b;">⚠️ ${uncounted.length} товарів не будуть оновлені (поле порожнє)</div>`:''}
+    ${uncounted.length>0?`<div style="margin-top:10px;font-size:12px;color:#f59e0b;"><span class="ms" style="font-size:14px;vertical-align:-2px;">warning</span> ${uncounted.length} товарів не будуть оновлені (поле порожнє)</div>`:''}
   `;
   document.getElementById('auditModal').classList.add('open');
 }
@@ -1004,7 +1011,7 @@ async function confirmAudit(){
 
   closeModal('auditModal');
   await loadItems();
-  toast(`✅ Інвентаризацію завершено! Оновлено ${diffs.length} позицій${updateErrors?', помилок: '+updateErrors:''}`, 'success');
+  toast(`Інвентаризацію завершено! Оновлено ${diffs.length} позицій${updateErrors?', помилок: '+updateErrors:''}`, 'success');
   // Скидаємо стан
   initAudit();
 }
@@ -1026,10 +1033,10 @@ async function loadReceipts(){
   if(tb) tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--ios-gray);">Завантаження...</td></tr>';
   const {data,error}=await db.from('inventory_receipts').select('*').order('received_at',{ascending:false}).limit(200);
   if(error){
-    const msg='⚠️ '+error.message;
+    const msg=msIcon('warning')+' '+error.message;
     if(tb) tb.innerHTML=`<tr><td colspan="6"><div class="empty">${msg}</div></td></tr>`;
     if(mb) mb.innerHTML=`<div class="empty" style="padding:32px 16px;text-align:center;color:#c2410c;font-size:13px;">${msg}<br><br><small style="color:var(--ios-gray)">Виконайте SQL-скрипт receipts_table.sql в Supabase SQL Editor</small></div>`;
-    toast('⚠️ Прихід: '+error.message,'error');
+    toast('Прихід: '+error.message,'error');
     return;
   }
   allReceipts=data||[];
@@ -1107,28 +1114,28 @@ function renderItems(){
   // Desktop table
   const tb=document.getElementById('itemsTable');
   if(!items.length){
-    tb.innerHTML='<tr><td colspan="7"><div class="empty"><div style="font-size:40px;margin-bottom:10px;">📭</div>Нічого не знайдено</div></td></tr>';
+    tb.innerHTML='<tr><td colspan="7"><div class="empty"><div style="margin-bottom:10px;"><span class="ms" style="font-size:40px;">search_off</span></div>Нічого не знайдено</div></td></tr>';
     const mc=document.getElementById('mobileCards');
-    if(mc) mc.innerHTML='<div class="empty" style="padding:32px;">📭 Нічого не знайдено</div>';
+    if(mc) mc.innerHTML='<div class="empty" style="padding:32px;"><span class="ms" style="font-size:16px;vertical-align:-3px;">search_off</span> Нічого не знайдено</div>';
     return;
   }
   tb.innerHTML=items.map((item,idx)=>{
     const qc=item.quantity==0?'qty-zero':item.quantity<=3?'qty-low':'qty-ok';
     const photoCell=item.photo_url
       ? `<img src="${item.photo_url}" class="photo-thumb" onclick="openLightbox('${item.photo_url}')" title="Переглянути">`
-      : `<div class="photo-ph" onclick="openPhotoModal(${item.id})" title="Додати фото">📷</div>`;
+      : `<div class="photo-ph" onclick="openPhotoModal(${item.id})" title="Додати фото"><span class="ms" style="font-size:18px;">photo_camera</span></div>`;
     return `<tr>
       <td style="color:#a5b4fc;font-size:12px;">${idx+1}</td>
       <td style="font-weight:600;color:#1e1b4b;max-width:280px;">${item.name}</td>
-      <td><span class="badge ${catBadge[item.category]||'bo'}">${catIcon[item.category]||'📦'} ${item.category}</span></td>
+      <td><span class="badge ${catBadge[item.category]||'bo'}">${catIconHtml[item.category]||catIconHtmlDefault} ${item.category}</span></td>
       <td style="color:#6b7280;font-size:12px;">${item.unit}</td>
       <td>${photoCell}</td>
       <td><span class="${qc}">${item.quantity}</span> <span style="color:#a5b4fc;font-size:11px;">${item.unit}</span></td>
       <td><div style="display:flex;gap:6px;">
-        <button class="btn btn-primary btn-sm" onclick="openQuick(${item.id})">➡️ Видати</button>
-        <button class="btn btn-ghost btn-sm" onclick="openHistory(${item.id})">🕐 Історія</button>
-        <button class="btn btn-ghost btn-sm" onclick="openPhotoModal(${item.id})">📷</button>
-        <button class="btn btn-danger btn-sm" onclick="openDelete(${item.id})">🗑️</button>
+        <button class="btn btn-primary btn-sm" onclick="openQuick(${item.id})"><span class="ms" style="font-size:15px;vertical-align:-3px;">output</span> Видати</button>
+        <button class="btn btn-ghost btn-sm" onclick="openHistory(${item.id})"><span class="ms" style="font-size:15px;vertical-align:-3px;">history</span> Історія</button>
+        <button class="btn btn-ghost btn-sm" onclick="openPhotoModal(${item.id})"><span class="ms" style="font-size:16px;">photo_camera</span></button>
+        <button class="btn btn-danger btn-sm" onclick="openDelete(${item.id})"><span class="ms" style="font-size:16px;">delete</span></button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1144,7 +1151,7 @@ function renderItems(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px;">
         <div style="flex:1;min-width:0;">
           <div style="font-size:13.5px;font-weight:700;color:#1e1b4b;line-height:1.4;margin-bottom:5px;">${item.name}</div>
-          <span class="badge ${catBadge[item.category]||'bo'}">${catIcon[item.category]||'📦'} ${item.category}</span>
+          <span class="badge ${catBadge[item.category]||'bo'}">${catIconHtml[item.category]||catIconHtmlDefault} ${item.category}</span>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
           ${photo}
@@ -1155,10 +1162,10 @@ function renderItems(){
         </div>
       </div>
       <div style="display:flex;gap:6px;">
-        <button class="btn btn-primary" style="flex:1;justify-content:center;padding:9px 8px;font-size:13px;" onclick="openQuick(${item.id})">➡️ Видати</button>
-        <button class="btn btn-ghost" style="padding:9px 12px;" onclick="openHistory(${item.id})" title="Історія">🕐</button>
-        <button class="btn btn-ghost" style="padding:9px 12px;" onclick="openPhotoModal(${item.id})" title="Фото">📷</button>
-        <button class="btn btn-danger" style="padding:9px 12px;" onclick="openDelete(${item.id})" title="Видалити">🗑️</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;padding:9px 8px;font-size:13px;" onclick="openQuick(${item.id})"><span class="ms" style="font-size:15px;vertical-align:-3px;">output</span> Видати</button>
+        <button class="btn btn-ghost" style="padding:9px 12px;" onclick="openHistory(${item.id})" title="Історія"><span class="ms" style="font-size:16px;">history</span></button>
+        <button class="btn btn-ghost" style="padding:9px 12px;" onclick="openPhotoModal(${item.id})" title="Фото"><span class="ms" style="font-size:16px;">photo_camera</span></button>
+        <button class="btn btn-danger" style="padding:9px 12px;" onclick="openDelete(${item.id})" title="Видалити"><span class="ms" style="font-size:16px;">delete</span></button>
       </div>
     </div>`;
   }).join('');
@@ -1221,13 +1228,13 @@ async function issueItem(itemId,qty,person,note){
   const {error:e1}=await db.from('inventory_items').update({quantity:newQ}).eq('id',itemId);
   const {error:e2}=await db.from('inventory_logs').insert([{item_id:itemId,item_name:item.name,quantity:qty,issued_to:person,note:note||null}]);
   if(e1||e2) return toast('Помилка: '+(e1?.message||e2?.message),'error');
-  toast('✅ Видано: '+qty+' '+item.unit+' → '+person,'success');
+  toast('Видано: '+qty+' '+item.unit+' → '+person,'success');
   await loadItems();
 }
 async function loadRecentIssues(){
   const {data}=await db.from('inventory_logs').select('*').order('issued_at',{ascending:false}).limit(7);
   const el=document.getElementById('recentIssues');
-  if(!data||!data.length){el.innerHTML='<div class="empty" style="padding:24px;font-size:13px;">📭 Видач ще не було</div>';return;}
+  if(!data||!data.length){el.innerHTML='<div class="empty" style="padding:24px;font-size:13px;"><span class="ms" style="font-size:16px;vertical-align:-3px;">inbox</span> Видач ще не було</div>';return;}
   el.innerHTML=data.map(l=>{
     const d=new Date(l.issued_at);
     const dt=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
@@ -1254,8 +1261,8 @@ function renderLog(){
   const tb=document.getElementById('logTable');
   const mb=document.getElementById('logMobileList');
   if(!logs.length){
-    tb.innerHTML='<tr><td colspan="6"><div class="empty">📭 Нічого не знайдено</div></td></tr>';
-    mb.innerHTML='<div class="empty">📭 Нічого не знайдено</div>';
+    tb.innerHTML='<tr><td colspan="6"><div class="empty"><span class="ms" style="font-size:16px;vertical-align:-3px;">search_off</span> Нічого не знайдено</div></td></tr>';
+    mb.innerHTML='<div class="empty"><span class="ms" style="font-size:16px;vertical-align:-3px;">search_off</span> Нічого не знайдено</div>';
     return;
   }
   tb.innerHTML=logs.map(l=>{
@@ -1270,8 +1277,8 @@ function renderLog(){
       <td style="color:#4b5563;">${l.issued_to||'—'}</td>
       <td style="color:#9ca3af;font-size:12px;">${l.note||'—'}</td>
       <td><div style="display:flex;gap:6px;">
-        <button class="btn btn-ghost btn-sm" onclick="openEditLog(${l.id})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="openDeleteLog(${l.id})">🗑️</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditLog(${l.id})"><span class="ms" style="font-size:16px;">edit</span></button>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteLog(${l.id})"><span class="ms" style="font-size:16px;">delete</span></button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1281,7 +1288,7 @@ function renderLog(){
     const dt=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
     const item=allItems.find(i=>i.id===l.item_id);
     const cat=item?item.category:'';
-    const icon=catIcon[cat]||'📦';
+    const icon=catIconHtml[cat]||catIconHtmlDefault;
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f3f4f6;">
       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ede9fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
@@ -1291,8 +1298,8 @@ function renderLog(){
       <div style="font-weight:800;color:#ef4444;font-size:13px;flex-shrink:0;text-align:right;">
         −${l.quantity}<span style="font-size:10px;font-weight:400;color:#a5b4fc;"> ${item?item.unit:''}</span>
         <div style="display:flex;gap:4px;margin-top:4px;">
-          <button onclick="openEditLog(${l.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;">✏️</button>
-          <button onclick="openDeleteLog(${l.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;">🗑️</button>
+          <button onclick="openEditLog(${l.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;"><span class="ms" style="font-size:16px;">edit</span></button>
+          <button onclick="openDeleteLog(${l.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;"><span class="ms" style="font-size:16px;">delete</span></button>
         </div>
       </div>
     </div>`;
@@ -1319,7 +1326,7 @@ async function confirmDeleteLog(){
   }
   const {error}=await db.from('inventory_logs').delete().eq('id',deleteLogId);
   if(error) return toast('Помилка: '+error.message,'error');
-  toast('🗑️ Запис видалено, товар повернуто на склад','success');
+  toast('Запис видалено, товар повернуто на склад','success');
   closeModal('delLogModal');
   deleteLogId=null;
   await loadItems();await loadLogs();
@@ -1342,17 +1349,17 @@ async function confirmEditLog(){
   const newQty=parseFloat(document.getElementById('editLogQty').value);
   const person=document.getElementById('editLogPerson').value.trim();
   const note=document.getElementById('editLogNote').value.trim();
-  if(isNaN(newQty)||newQty<0) return toast('⚠️ Введіть коректну кількість','error');
+  if(isNaN(newQty)||newQty<0) return toast('Введіть коректну кількість','error');
   const item=allItems.find(i=>i.id===l.item_id);
   if(item){
     const diff=l.quantity-newQty;
     const adjustedStock=Math.round((item.quantity+diff)*100)/100;
-    if(adjustedStock<0) return toast('⚠️ Недостатньо товару на складі для такої кількості','error');
+    if(adjustedStock<0) return toast('Недостатньо товару на складі для такої кількості','error');
     await db.from('inventory_items').update({quantity:adjustedStock}).eq('id',item.id);
   }
   const {error}=await db.from('inventory_logs').update({quantity:newQty,issued_to:person||null,note:note||null}).eq('id',editLogId);
   if(error) return toast('Помилка: '+error.message,'error');
-  toast('✅ Запис оновлено','success');
+  toast('Запис оновлено','success');
   closeModal('editLogModal');
   editLogId=null;
   await loadItems();await loadLogs();
@@ -1366,8 +1373,8 @@ function renderReceipts(){
   const tb=document.getElementById('recTable');
   const mb=document.getElementById('recMobileList');
   if(!recs.length){
-    tb.innerHTML='<tr><td colspan="6"><div class="empty">📭 Приходів ще не було</div></td></tr>';
-    mb.innerHTML='<div class="empty">📭 Приходів ще не було</div>';
+    tb.innerHTML='<tr><td colspan="6"><div class="empty"><span class="ms" style="font-size:16px;vertical-align:-3px;">inbox</span> Приходів ще не було</div></td></tr>';
+    mb.innerHTML='<div class="empty"><span class="ms" style="font-size:16px;vertical-align:-3px;">inbox</span> Приходів ще не було</div>';
     return;
   }
   tb.innerHTML=recs.map(r=>{
@@ -1381,8 +1388,8 @@ function renderReceipts(){
       <td style="color:#4b5563;">${r.supplier||'—'}</td>
       <td style="color:#9ca3af;font-size:12px;">${r.note||'—'}</td>
       <td><div style="display:flex;gap:6px;">
-        <button class="btn btn-ghost btn-sm" onclick="openEditReceipt(${r.id})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="openDeleteReceipt(${r.id})">🗑️</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditReceipt(${r.id})"><span class="ms" style="font-size:16px;">edit</span></button>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteReceipt(${r.id})"><span class="ms" style="font-size:16px;">delete</span></button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1399,8 +1406,8 @@ function renderReceipts(){
       <div style="font-weight:800;color:var(--ios-green);font-size:13px;flex-shrink:0;text-align:right;">
         +${r.quantity}<span style="font-size:10px;font-weight:400;color:#a5b4fc;"> ${item?item.unit:''}</span>
         <div style="display:flex;gap:4px;margin-top:4px;">
-          <button onclick="openEditReceipt(${r.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;">✏️</button>
-          <button onclick="openDeleteReceipt(${r.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;">🗑️</button>
+          <button onclick="openEditReceipt(${r.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;"><span class="ms" style="font-size:16px;">edit</span></button>
+          <button onclick="openDeleteReceipt(${r.id})" style="background:none;border:none;font-size:14px;padding:2px;cursor:pointer;"><span class="ms" style="font-size:16px;">delete</span></button>
         </div>
       </div>
     </div>`;
@@ -1421,12 +1428,12 @@ async function confirmDeleteReceipt(){
   const item=allItems.find(i=>i.id===r.item_id);
   if(item){
     const newQ=Math.round((item.quantity-r.quantity)*100)/100;
-    if(newQ<0) return toast('⚠️ Видалення призведе до від\'ємного залишку','error');
+    if(newQ<0) return toast('Видалення призведе до від\'ємного залишку','error');
     await db.from('inventory_items').update({quantity:newQ}).eq('id',item.id);
   }
   const {error}=await db.from('inventory_receipts').delete().eq('id',deleteReceiptId);
   if(error) return toast('Помилка: '+error.message,'error');
-  toast('🗑️ Прихід видалено, залишок скориговано','success');
+  toast('Прихід видалено, залишок скориговано','success');
   closeModal('delReceiptModal');
   deleteReceiptId=null;
   await loadItems();await loadReceipts();
@@ -1449,17 +1456,17 @@ async function confirmEditReceipt(){
   const newQty=parseFloat(document.getElementById('editReceiptQty').value);
   const supplier=document.getElementById('editReceiptSupplier').value.trim();
   const note=document.getElementById('editReceiptNote').value.trim();
-  if(isNaN(newQty)||newQty<0) return toast('⚠️ Введіть коректну кількість','error');
+  if(isNaN(newQty)||newQty<0) return toast('Введіть коректну кількість','error');
   const item=allItems.find(i=>i.id===r.item_id);
   if(item){
     const diff=newQty-r.quantity;
     const adjustedStock=Math.round((item.quantity+diff)*100)/100;
-    if(adjustedStock<0) return toast('⚠️ Це призведе до від\'ємного залишку','error');
+    if(adjustedStock<0) return toast('Це призведе до від\'ємного залишку','error');
     await db.from('inventory_items').update({quantity:adjustedStock}).eq('id',item.id);
   }
   const {error}=await db.from('inventory_receipts').update({quantity:newQty,supplier:supplier||null,note:note||null}).eq('id',editReceiptId);
   if(error) return toast('Помилка: '+error.message,'error');
-  toast('✅ Прихід оновлено','success');
+  toast('Прихід оновлено','success');
   closeModal('editReceiptModal');
   editReceiptId=null;
   await loadItems();await loadReceipts();
@@ -1490,13 +1497,13 @@ async function doRefill(){
     const {error:recErr}=await db.from('inventory_receipts').insert([{item_id:id,item_name:item.name,quantity:qty,supplier:supplier||null,note:note||null}]);
     if(recErr){
       console.warn('inventory_receipts insert failed:',recErr.message);
-      toast('⚠️ Залишок оновлено, але прихід не збережено: '+recErr.message,'error');
+      toast('Залишок оновлено, але прихід не збережено: '+recErr.message,'error');
     }
   }catch(e){
     console.warn('inventory_receipts insert exception:',e);
-    toast('⚠️ Залишок оновлено, але прихід не збережено','error');
+    toast('Залишок оновлено, але прихід не збережено','error');
   }
-  toast('✅ Поповнено +'+qty+' '+item.unit,'success');
+  toast('Поповнено +'+qty+' '+item.unit,'success');
   document.getElementById('refillQtyI').value='';
   document.getElementById('refillSupplierI').value='';
   document.getElementById('refillNoteI').value='';
@@ -1510,7 +1517,7 @@ async function doAddNew(){
   const unit=document.getElementById('newUnit').value.trim()||'шт';
   const quantity=parseFloat(document.getElementById('newQty').value)||0;
   if(!name) return toast('Введіть назву товару!','error');
-  if(/^\d+([.,]\d+)?$/.test(unit)) return toast('⚠️ "Одиниця" має бути словом (напр. "шт", "уп."), а не числом!','error');
+  if(/^\d+([.,]\d+)?$/.test(unit)) return toast('"Одиниця" має бути словом (напр. "шт", "уп."), а не числом!','error');
   const {data:newItem,error}=await db.from('inventory_items').insert([{name,category,unit,quantity}]).select().single();
   if(error) return toast('Помилка: '+error.message,'error');
   // записуємо початковий прихід якщо кількість > 0
@@ -1525,14 +1532,14 @@ async function doAddNew(){
       }]);
     }catch(e){console.warn('receipt insert failed',e);}
   }
-  toast('✅ "'+name+'" додано!','success');
+  toast('"'+name+'" додано!','success');
   ['newName','newUnit','newQty'].forEach(k=>document.getElementById(k).value='');
   await loadItems();populateSels();renderAddLow();
 }
 function renderAddLow(){
   const low=allItems.filter(i=>i.quantity<=3).sort((a,b)=>a.quantity-b.quantity).slice(0,10);
   const el=document.getElementById('addLowList');
-  if(!low.length){el.innerHTML='<div style="font-size:13px;color:#10b981;font-weight:600;">✅ Все в нормі!</div>';return;}
+  if(!low.length){el.innerHTML='<div style="font-size:13px;color:#10b981;font-weight:600;"><span class="ms" style="font-size:15px;vertical-align:-3px;">check_circle</span> Все в нормі!</div>';return;}
   el.innerHTML=low.map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f3f4f6;font-size:13px;">
     <span style="color:#4b5563;flex:1;margin-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.name}</span>
     <span class="${i.quantity==0?'qty-zero':'qty-low'}">${i.quantity}</span>
@@ -1550,7 +1557,7 @@ async function confirmDelete(){
   if(!deleteItemId) return;
   const {error}=await db.from('inventory_items').delete().eq('id',deleteItemId);
   if(error) return toast('Помилка: '+error.message,'error');
-  toast('🗑️ Товар видалено','info');
+  toast('Товар видалено','info');
   closeModal('delModal');deleteItemId=null;
   await loadItems();
 }
@@ -1590,7 +1597,7 @@ async function uploadPhoto(){
       const {error:upErr}=await db.storage.from('photos').upload(path,blob,{contentType:'image/jpeg',upsert:true});
       if(upErr){
         if(/bucket/i.test(upErr.message)){
-          status.innerHTML='❌ Сховище фото не налаштовано.<br><small>Потрібно створити Storage bucket "photos" (Public) в Supabase Dashboard.</small>';
+          status.innerHTML='<span class="ms" style="font-size:15px;vertical-align:-3px;">cancel</span> Сховище фото не налаштовано.<br><small>Потрібно створити Storage bucket "photos" (Public) в Supabase Dashboard.</small>';
         } else {
           status.textContent='Помилка: '+upErr.message;
         }
@@ -1599,7 +1606,7 @@ async function uploadPhoto(){
       const {data:{publicUrl}}=db.storage.from('photos').getPublicUrl(path);
       const {error:dbErr}=await db.from('inventory_items').update({photo_url:publicUrl}).eq('id',photoItemId);
       if(dbErr){status.textContent='Помилка: '+dbErr.message;return;}
-      status.textContent='✅ Збережено!';
+      status.innerHTML='<span class="ms" style="font-size:14px;vertical-align:-2px;">check_circle</span> Збережено!';
       await loadItems();openPhotoModal(photoItemId);
     },'image/jpeg',0.82);
   };
@@ -1625,7 +1632,7 @@ function renderStats(){
     const c=catColor[cat]||'#64748b';
     return `<div>
       <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
-        <span style="font-weight:600;color:#1e1b4b;">${catIcon[cat]||'📦'} ${cat}</span>
+        <span style="font-weight:600;color:#1e1b4b;">${catIconHtml[cat]||catIconHtmlDefault} ${cat}</span>
         <span style="color:#6b7280;">${items.length} поз.</span>
       </div>
       <div class="pbar"><div class="pfill" style="width:${pct}%;background:${c};"></div></div>
@@ -1637,7 +1644,7 @@ function renderStats(){
         <span style="color:#4b5563;flex:1;margin-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${i.name}</span>
         <span class="${i.quantity==0?'qty-zero':'qty-low'}" style="flex-shrink:0;white-space:nowrap;">${i.quantity} ${i.unit}</span>
       </div>`).join('')
-    : '<div style="color:#10b981;font-weight:600;font-size:13px;">✅ Всі товари в нормі!</div>';
+    : '<div style="color:#10b981;font-weight:600;font-size:13px;"><span class="ms" style="font-size:15px;vertical-align:-3px;">check_circle</span> Всі товари в нормі!</div>';
   document.getElementById('statLog').innerHTML=allLogs.slice(0,10).map(l=>{
     const d=new Date(l.issued_at).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f3f4f6;font-size:13px;">
@@ -1662,7 +1669,7 @@ function exportExcel(){
   }
   const date=new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\./g,'-');
   XLSX.writeFile(wb,'Склад_ОСББ_'+date+'.xlsx');
-  toast('📤 Excel завантажено!','success');
+  toast('Excel завантажено!','success');
 }
 
 
@@ -1696,12 +1703,12 @@ function openBarcodeAddScanner(){
         window.open('https://www.google.com/search?q='+encodeURIComponent(decoded),'_blank');
       },
       ()=>{}
-    ).catch(()=>{document.getElementById('barcodeAddScanning').textContent='⚠️ Не вдалось запустити камеру.';});
+    ).catch(()=>{document.getElementById('barcodeAddScanning').innerHTML='<span class="ms" style="font-size:14px;vertical-align:-2px;">warning</span> Не вдалось запустити камеру.';});
   },300);
 }
 function searchManualBarcode(){
   const code=document.getElementById('manualBarcodeI').value.trim();
-  if(!code){toast('⚠️ Введіть штрих-код','error');return;}
+  if(!code){toast('Введіть штрих-код','error');return;}
   window.open('https://www.google.com/search?q='+encodeURIComponent(code),'_blank');
 }
 function searchInGoogle(){
@@ -1731,14 +1738,14 @@ function openQR(){
       {fps:10,qrbox:{width:220,height:220}},
       (decoded)=>{
         document.getElementById('qrResult').style.display='block';
-        document.getElementById('qrResult').textContent='✅ Зчитано: '+decoded;
+        document.getElementById('qrResult').innerHTML='<span class="ms" style="font-size:14px;vertical-align:-2px;">check_circle</span> Зчитано: '+escapeHtml(decoded);
         const found=allItems.find(i=>i.name.toLowerCase().includes(decoded.toLowerCase())||decoded.includes(String(i.id)));
         if(found){stopQR();closeModal('qrModal');openQuick(found.id);}
       },
       ()=>{}
     ).catch(()=>{
       document.getElementById('qrResult').style.display='block';
-      document.getElementById('qrResult').textContent='⚠️ Не вдалось запустити камеру. Перевірте дозволи браузера.';
+      document.getElementById('qrResult').innerHTML='<span class="ms" style="font-size:14px;vertical-align:-2px;">warning</span> Не вдалось запустити камеру. Перевірте дозволи браузера.';
     });
   },300);
 }
@@ -1811,9 +1818,15 @@ function closeModal(id,e){
 
 // ===== TOAST =====
 let toastT;
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const toastIcons={success:'check_circle',error:'error',info:'info'};
 function toast(msg,type=''){
   const el=document.getElementById('toast');
-  el.textContent=msg;el.className='show '+(type||'info');
+  const t=type||'info';
+  el.innerHTML=msIcon(toastIcons[t]||'info','16px')+' '+escapeHtml(msg);
+  el.className='show '+t;
   clearTimeout(toastT);toastT=setTimeout(()=>el.className='',3200);
 }
 
