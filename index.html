@@ -166,20 +166,13 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 #recMobileList{display:none;}
 
 @media(max-width:960px){
-  .split,.g4{grid-template-columns:1fr 1fr;}
-  .sidebar{width:60px;}
-  .ni .nav-label,.sb-logo h1,.sb-logo p,.sb-ver,.sb-bottom{display:none;}
-  .main{margin-left:60px;}
-}
-
-/* ===TABLET=== */
-@media(max-width:960px){
   .split{grid-template-columns:1fr!important;}
   .g4{grid-template-columns:1fr 1fr;}
   .sidebar{width:64px;}
   .ni .nav-label,.sb-logo h1,.sb-logo p,.sb-ver,.sb-bottom{display:none!important;}
   .ni{justify-content:center;padding:12px 0;margin:2px 4px;}
   .main{margin-left:64px;}
+  .sb-logo{padding:12px 8px;}
 }
 
 /* ===MOBILE === */
@@ -1791,8 +1784,6 @@ document.addEventListener('keydown',e=>{
 });
 
 loadItems().then(()=>loadLogs());
-// DEBUG: показати розмір екрану
-setTimeout(()=>toast('Екран: '+window.innerWidth+'x'+window.innerHeight,'success'),1000);
 </script>
 
 <!-- BOTTOM NAV (mobile) -->
