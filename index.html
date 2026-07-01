@@ -164,6 +164,9 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 .split{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start;}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
 .empty{text-align:center;padding:48px;color:var(--ios-gray);}
+.ms{font-family:'Material Symbols Rounded';font-size:22px;line-height:1;user-select:none;-webkit-user-select:none;vertical-align:middle;}
+.ni-icon .ms{font-size:20px;}
+.bn-icon .ms{font-size:24px;}
 #logMobileList{display:none;}
 #recMobileList{display:none;}
 
@@ -286,6 +289,7 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 canvas#stockChart{width:100%!important;max-height:300px;}
 
 </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,1,0">
 </head>
 <body>
 
@@ -360,15 +364,15 @@ function pinPress(k){
   </div>
   <nav>
     <div class="ni active" data-page="items" onclick="nav('items',this)">
-      <span class="ni-icon">📦</span><span class="nav-label">Товари</span>
+      <span class="ni-icon"><span class="ms">inventory_2</span></span><span class="nav-label">Товари</span>
       <span class="ni-badge" id="sb-alert" style="display:none">!</span>
     </div>
-    <div class="ni" data-page="issue" onclick="nav('issue',this)"><span class="ni-icon">➡️</span><span class="nav-label">Видача</span></div>
-    <div class="ni" data-page="log" onclick="nav('log',this)"><span class="ni-icon">📋</span><span class="nav-label">Журнал</span></div>
-    <div class="ni" data-page="add" onclick="nav('add',this)"><span class="ni-icon">➕</span><span class="nav-label">Додати</span></div>
-    <div class="ni" data-page="audit" onclick="nav('audit',this)"><span class="ni-icon">📋</span><span class="nav-label">Інвентаризація</span></div>
-    <div class="ni" data-page="receipts" onclick="nav('receipts',this)"><span class="ni-icon">📥</span><span class="nav-label">Прихід</span></div>
-    <div class="ni" data-page="stats" onclick="nav('stats',this)"><span class="ni-icon">📊</span><span class="nav-label">Статистика</span></div>
+    <div class="ni" data-page="issue" onclick="nav('issue',this)"><span class="ni-icon"><span class="ms">output</span></span><span class="nav-label">Видача</span></div>
+    <div class="ni" data-page="log" onclick="nav('log',this)"><span class="ni-icon"><span class="ms">receipt_long</span></span><span class="nav-label">Журнал</span></div>
+    <div class="ni" data-page="add" onclick="nav('add',this)"><span class="ni-icon"><span class="ms">add_circle</span></span><span class="nav-label">Додати</span></div>
+    <div class="ni" data-page="audit" onclick="nav('audit',this)"><span class="ni-icon"><span class="ms">fact_check</span></span><span class="nav-label">Інвентаризація</span></div>
+    <div class="ni" data-page="receipts" onclick="nav('receipts',this)"><span class="ni-icon"><span class="ms">move_to_inbox</span></span><span class="nav-label">Прихід</span></div>
+    <div class="ni" data-page="stats" onclick="nav('stats',this)"><span class="ni-icon"><span class="ms">bar_chart</span></span><span class="nav-label">Статистика</span></div>
   </nav>
   <div class="sb-bottom">ОСББ «Микитська Слобода»</div>
 </div>
@@ -378,8 +382,8 @@ function pinPress(k){
     <h2 id="pageTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;font-size:15px;">📦 Товари на складі</h2>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span id="lastUpdate" style="font-size:11px;color:#a5b4fc;display:none;" class="topbar-right-excel"></span>
-      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік">📊</button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер">📷</button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару">📥</button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
-      <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="white-space:nowrap;">🔄 Оновити</button>
+      <button class="btn btn-ghost btn-sm topbar-right-excel" onclick="openChartModal()" style="padding:6px 10px;" title="Графік"><span class="ms" style="font-size:20px;">bar_chart</span></button><button class="btn btn-ghost btn-sm" onclick="openQR()" style="padding:6px 10px;" title="Сканер"><span class="ms" style="font-size:20px;">qr_code_scanner</span></button><button class="btn btn-ghost btn-sm" onclick="goReceipts()" style="padding:6px 10px;" title="Прихід товару"><span class="ms" style="font-size:20px;">move_to_inbox</span></button><button class="btn btn-excel btn-sm topbar-right-excel" onclick="exportExcel()">📤 Excel</button>
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="white-space:nowrap;"><span class="ms" style="font-size:18px;vertical-align:-4px;">sync</span> Оновити</button>
     </div>
   </div>
 
@@ -396,7 +400,7 @@ function pinPress(k){
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <button class="pill" id="inStockPill" onclick="toggleInStock(this)" style="border-color:var(--ios-green);color:var(--ios-green);">✅ Тільки в наявності</button>
+        <button class="pill" id="inStockPill" onclick="toggleInStock(this)" style="border-color:var(--ios-green);color:var(--ios-green);display:flex;align-items:center;gap:4px;"><span class="ms" style="font-size:16px;">check_circle</span> Тільки в наявності</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;" id="catPills" class="pills-wrap">
         <button class="pill active" onclick="filterCat(this,'')">Всі</button>
@@ -1801,24 +1805,24 @@ loadItems().then(()=>loadLogs());
 <!-- BOTTOM NAV (mobile) -->
 <div class="bottom-nav" id="bottomNav">
   <button class="bn-item active" data-page="items" onclick="nav('items',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📦</span></div>
+    <div class="bn-icon-wrap"><span class="bn-icon"><span class="ms">inventory_2</span></span></div>
     <span class="bn-label">Товари</span>
     <span class="bn-badge" id="bn-alert" style="display:none">!</span>
   </button>
   <button class="bn-item" data-page="issue" onclick="nav('issue',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📤</span></div>
+    <div class="bn-icon-wrap"><span class="bn-icon"><span class="ms">output</span></span></div>
     <span class="bn-label">Видача</span>
   </button>
   <button class="bn-item" data-page="log" onclick="nav('log',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">🗒️</span></div>
+    <div class="bn-icon-wrap"><span class="bn-icon"><span class="ms">receipt_long</span></span></div>
     <span class="bn-label">Журнал</span>
   </button>
   <button class="bn-item" data-page="add" onclick="nav('add',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">➕</span></div>
+    <div class="bn-icon-wrap"><span class="bn-icon"><span class="ms">add_circle</span></span></div>
     <span class="bn-label">Додати</span>
   </button>
   <button class="bn-item" data-page="audit" onclick="nav('audit',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📋</span></div>
+    <div class="bn-icon-wrap"><span class="bn-icon"><span class="ms">fact_check</span></span></div>
     <span class="bn-label">Інвент.</span>
   </button>
 </div>
