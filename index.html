@@ -25,6 +25,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 *{font-family:-apple-system,'SF Pro Display','SF Pro Text','Helvetica Neue','Inter',sans-serif;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+button{-webkit-tap-highlight-color:transparent;outline:none;}
+button:focus,button:focus-visible{outline:none;}
 :root{
   --sb:240px;
   --ios-blue:#007AFF;
@@ -236,11 +238,11 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
 
 /* ===BOTTOM NAV iOS style=== */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(248,248,248,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:30;height:66px;align-items:stretch;border-top:1px solid var(--ios-sep);padding-bottom:env(safe-area-inset-bottom);}
-.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ios-gray);font-size:10px;font-weight:500;cursor:pointer;transition:all .15s;padding:6px 0;position:relative;-webkit-tap-highlight-color:transparent;outline:none;user-select:none;-webkit-user-select:none;}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ios-gray);font-size:10px;font-weight:500;cursor:pointer;transition:color .15s;padding:6px 0;position:relative;-webkit-tap-highlight-color:transparent;outline:none;border:none;background:transparent;font-family:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
 .bn-item.active{color:var(--ios-blue);}
 .bn-item.active .bn-icon-wrap{background:rgba(0,122,255,.1);}
-.bn-icon-wrap{width:44px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent;outline:none;}
-.bn-item:focus,.bn-item:focus-visible{outline:none;}
+.bn-item:focus,.bn-item:focus-visible,.bn-item:focus-within{outline:none;box-shadow:none;}
+.bn-icon-wrap{width:44px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:background .15s;background:transparent;}
 .bn-icon{font-size:20px;line-height:1;}
 .bn-badge{position:absolute;top:4px;right:calc(50% - 20px);background:var(--ios-red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;}
 .bn-label{font-size:10px;letter-spacing:-.1px;}
@@ -1797,27 +1799,27 @@ loadItems().then(()=>loadLogs());
 
 <!-- BOTTOM NAV (mobile) -->
 <div class="bottom-nav" id="bottomNav">
-  <div class="bn-item active" data-page="items" onclick="nav('items',this)">
+  <button class="bn-item active" data-page="items" onclick="nav('items',this)">
     <div class="bn-icon-wrap"><span class="bn-icon">📦</span></div>
     <span class="bn-label">Товари</span>
     <span class="bn-badge" id="bn-alert" style="display:none">!</span>
-  </div>
-  <div class="bn-item" data-page="issue" onclick="nav('issue',this)">
+  </button>
+  <button class="bn-item" data-page="issue" onclick="nav('issue',this)">
     <div class="bn-icon-wrap"><span class="bn-icon">📤</span></div>
     <span class="bn-label">Видача</span>
-  </div>
-  <div class="bn-item" data-page="log" onclick="nav('log',this)">
+  </button>
+  <button class="bn-item" data-page="log" onclick="nav('log',this)">
     <div class="bn-icon-wrap"><span class="bn-icon">🗒️</span></div>
     <span class="bn-label">Журнал</span>
-  </div>
-  <div class="bn-item" data-page="add" onclick="nav('add',this)">
+  </button>
+  <button class="bn-item" data-page="add" onclick="nav('add',this)">
     <div class="bn-icon-wrap"><span class="bn-icon">➕</span></div>
     <span class="bn-label">Додати</span>
-  </div>
-  <div class="bn-item" data-page="audit" onclick="nav('audit',this)">
+  </button>
+  <button class="bn-item" data-page="audit" onclick="nav('audit',this)">
     <div class="bn-icon-wrap"><span class="bn-icon">📋</span></div>
     <span class="bn-label">Інвент.</span>
-  </div>
+  </button>
 </div>
 
 
