@@ -226,7 +226,12 @@ label{display:block;font-size:12px;font-weight:600;color:var(--ios-label3);margi
   #page-add .card{padding:14px!important;}
   #page-add h3{font-size:15px!important;margin-bottom:14px!important;}
   #page-add .split{display:flex!important;flex-direction:column!important;}
-  .sw{width:100%!important;}
+  #page-audit .card{padding:12px 14px!important;}
+  #auditList>div{padding:10px 12px!important;}
+  #auditList input[type=number]{width:70px!important;font-size:17px!important;}
+  #page-audit>div:first-child .btn{font-size:12px!important;padding:6px 10px!important;}
+  #page-audit>div:first-child{flex-direction:column!important;}
+  #page-audit>div:first-child>div:first-child{flex-direction:column!important;gap:8px!important;}
 }
 
 /* ===BOTTOM NAV iOS style=== */
@@ -1808,9 +1813,9 @@ loadItems().then(()=>loadLogs());
     <div class="bn-icon-wrap"><span class="bn-icon">➕</span></div>
     <span class="bn-label">Додати</span>
   </div>
-  <div class="bn-item" data-page="stats" onclick="nav('stats',this)">
-    <div class="bn-icon-wrap"><span class="bn-icon">📊</span></div>
-    <span class="bn-label">Звіт</span>
+  <div class="bn-item" data-page="audit" onclick="nav('audit',this)">
+    <div class="bn-icon-wrap"><span class="bn-icon">📋</span></div>
+    <span class="bn-label">Інвент.</span>
   </div>
 </div>
 
